@@ -12,6 +12,8 @@ declare global {
         options: {
           sitekey: string;
           callback: (token: string) => void;
+          "error-callback"?: () => void;
+          "expired-callback"?: () => void;
         },
       ): string;
       reset(widgetId: string): void;
@@ -23,6 +25,8 @@ declare global {
         options: {
           sitekey: string;
           callback: (token: string) => void;
+          "error-callback"?: () => void;
+          "expired-callback"?: () => void;
         },
       ): number;
       reset(widgetId: number): void;

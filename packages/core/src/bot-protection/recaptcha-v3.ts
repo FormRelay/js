@@ -10,6 +10,13 @@ export async function loadRecaptchaV3(options: RecaptchaV3Options): Promise<BotP
   const scriptUrl = `https://www.google.com/recaptcha/api.js?render=${options.siteKey}`;
   await loadScript(scriptUrl);
 
+  if (typeof window.grecaptcha === "undefined") {
+    throw new Error(
+      "reCAPTCHA failed to initialize after script load. " +
+        "This may be caused by an ad blocker or content security policy.",
+    );
+  }
+
   await new Promise<void>((resolve) => {
     window.grecaptcha.ready(() => resolve());
   });

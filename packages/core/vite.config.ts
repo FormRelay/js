@@ -11,7 +11,18 @@ export default defineConfig({
     },
     dts: true,
     format: ["esm", "cjs"],
-    exports: true,
+    exports: {
+      customExports(pkg) {
+        for (const [key, value] of Object.entries(pkg)) {
+          if (key === "./package.json" || typeof value === "string") continue;
+          const entry = value as Record<string, string>;
+          if (entry.import && !entry.types) {
+            entry.types = entry.import.replace(".mjs", ".d.mts");
+          }
+        }
+        return pkg;
+      },
+    },
   },
   test: {
     include: ["src/**/*.test.ts"],

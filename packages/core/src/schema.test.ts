@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
+import { FormRelayError } from "./errors";
 import type { HttpAdapter, HttpResponse } from "./http/types";
 import { createSchemaFetcher } from "./schema";
 
@@ -170,5 +171,47 @@ describe("createSchemaFetcher", () => {
     const secondCallHeaders = (client.get as ReturnType<typeof vi.fn>).mock.calls[1]![1].headers;
     expect(secondCallHeaders["If-None-Match"]).toBe('"v1"');
     expect(secondCallHeaders["If-Modified-Since"]).toBe("Mon, 01 Jan 2026 00:00:00 GMT");
+  });
+
+  test("throws FormRelayError on non-2xx response with JSON body", async () => {
+    const client = createMockHttpClient([
+      {
+        status: 403,
+        headers: { get: () => null },
+        json: () =>
+          Promise.resolve({
+            type: "https://formrelay.app/errors#forbidden",
+            title: "Forbidden",
+            detail: "Invalid public key.",
+          }),
+      },
+    ]);
+
+    const getSchema = createSchemaFetcher("01abc", "https://formrelay.app", "pk_fr_bad", client);
+
+    try {
+      await getSchema();
+      expect.unreachable("should have thrown");
+    } catch (error) {
+      expect(error).toBeInstanceOf(FormRelayError);
+      expect((error as FormRelayError).status).toBe(403);
+      expect((error as FormRelayError).detail).toBe("Invalid public key.");
+    }
+  });
+
+  test("throws FormRelayError on non-2xx response with non-JSON body", async () => {
+    const client = createMockHttpClient([
+      {
+        status: 502,
+        headers: { get: () => null },
+        json: () => Promise.reject(new SyntaxError("Unexpected token <")),
+      },
+    ]);
+
+    const getSchema = createSchemaFetcher("01abc", "https://formrelay.app", "pk_fr_test", client);
+
+    await expect(getSchema()).rejects.toThrow(
+      "Failed to fetch form schema: server returned HTTP 502",
+    );
   });
 });

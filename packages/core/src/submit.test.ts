@@ -252,4 +252,38 @@ describe("submitForm", () => {
 
     expect(data).toEqual({ email: "john@example.com" });
   });
+
+  test("returns error result when server returns non-JSON error", async () => {
+    const client = createMockHttpClient({
+      status: 502,
+      headers: { get: () => null },
+      json: () => Promise.reject(new SyntaxError("Unexpected token <")),
+    });
+
+    const result = await submitForm({ email: "john@example.com" }, BASE_SCHEMA, client);
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBeInstanceOf(FormRelayError);
+      expect(result.error.status).toBe(502);
+      expect(result.error.detail).toContain("HTTP 502");
+    }
+  });
+
+  test("throws on unknown bot protection type", async () => {
+    const schema: FormSchema = {
+      ...BASE_SCHEMA,
+      botProtection: { type: "unknown_type" as any, siteKey: "key" },
+    };
+
+    const client = createMockHttpClient({
+      status: 200,
+      headers: { get: () => null },
+      json: () => Promise.resolve({ message: "OK" }),
+    });
+
+    await expect(
+      submitForm({ email: "john@example.com" }, schema, client, { botToken: "token" }),
+    ).rejects.toThrow('Unknown bot protection type "unknown_type"');
+  });
 });

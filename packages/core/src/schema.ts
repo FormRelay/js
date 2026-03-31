@@ -1,5 +1,6 @@
 import type { HttpAdapter } from "./http/types";
 import type { BotProtection, FormField, FormSchema } from "./types";
+import { FormRelayError, parseErrorResponse } from "./errors";
 
 interface SchemaCache {
   etag: string | null;
@@ -56,6 +57,21 @@ export function createSchemaFetcher(
 
     if (response.status === 304 && cache) {
       return cache.schema;
+    }
+
+    if (response.status < 200 || response.status >= 300) {
+      let errorBody: Record<string, unknown>;
+      try {
+        errorBody = (await response.json()) as Record<string, unknown>;
+      } catch {
+        throw new FormRelayError({
+          type: "",
+          title: "Schema Fetch Failed",
+          status: response.status,
+          detail: `Failed to fetch form schema: server returned HTTP ${response.status}`,
+        });
+      }
+      throw parseErrorResponse(errorBody, response.status);
     }
 
     const body = (await response.json()) as RawSchemaResponse;
