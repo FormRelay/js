@@ -9,6 +9,10 @@ importers:
   .: {}
 
   packages/core:
+    dependencies:
+      '@cfworker/json-schema':
+        specifier: ^4.1.1
+        version: 4.1.1
     devDependencies:
       typescript:
         specifier: latest
@@ -207,6 +211,9 @@ packages:
         optional: true
       commander:
         optional: true
+
+  '@cfworker/json-schema@4.1.1':
+    resolution: {integrity: sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==}
 
   '@clack/core@1.2.0':
     resolution: {integrity: sha512-qfxof/3T3t9DPU/Rj3OmcFyZInceqj/NVtO9rwIuJqCUgh32gwPjpFQQp/ben07qKlhpwq7GzfWpST4qdJ5Drg==}
@@ -4346,6 +4353,8 @@ snapshots:
     optionalDependencies:
       cac: 6.7.14
       citty: 0.2.1
+
+  '@cfworker/json-schema@4.1.1': {}
 
   '@clack/core@1.2.0':
     dependencies:
