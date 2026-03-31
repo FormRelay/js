@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "vp run -r build",
-    "test": "vp test",
+    "test": "vp run -r test",
     "lint": "vp lint",
     "fmt": "vp fmt"
   },
