@@ -1,33 +1,14 @@
 import type { BotProtectionWidget } from "./types";
 import { loadScript } from "./load-script";
 
-declare global {
-  interface Window {
-    grecaptcha: {
-      render(
-        container: HTMLElement,
-        options: {
-          sitekey: string;
-          callback: (token: string) => void;
-        },
-      ): number;
-      reset(widgetId: number): void;
-      getResponse(widgetId: number): string;
-    };
-  }
-}
-
 export interface RecaptchaV2Options {
   siteKey: string;
   container: HTMLElement;
 }
 
-const RECAPTCHA_SCRIPT =
-  "https://www.google.com/recaptcha/api.js?render=explicit";
+const RECAPTCHA_SCRIPT = "https://www.google.com/recaptcha/api.js?render=explicit";
 
-export async function loadRecaptchaV2(
-  options: RecaptchaV2Options,
-): Promise<BotProtectionWidget> {
+export async function loadRecaptchaV2(options: RecaptchaV2Options): Promise<BotProtectionWidget> {
   await loadScript(RECAPTCHA_SCRIPT);
 
   let resolveToken: ((token: string) => void) | null = null;

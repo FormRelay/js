@@ -13,24 +13,13 @@ export interface FormClientOptions {
 
 export interface FormClient {
   getSchema(): Promise<FormSchema>;
-  submit(
-    data: Record<string, unknown>,
-    options?: SubmitOptions,
-  ): Promise<SubmitResult>;
+  submit(data: Record<string, unknown>, options?: SubmitOptions): Promise<SubmitResult>;
 }
 
-export function createForm(
-  formId: string,
-  options: FormClientOptions,
-): FormClient {
+export function createForm(formId: string, options: FormClientOptions): FormClient {
   const baseUrl = options.baseUrl ?? "https://formrelay.app";
   const httpClient = options.httpClient ?? createFetchAdapter();
-  const fetchSchema = createSchemaFetcher(
-    formId,
-    baseUrl,
-    options.publicKey,
-    httpClient,
-  );
+  const fetchSchema = createSchemaFetcher(formId, baseUrl, options.publicKey, httpClient);
 
   let cachedSchema: FormSchema | null = null;
 
@@ -40,10 +29,7 @@ export function createForm(
       return cachedSchema;
     },
 
-    async submit(
-      data: Record<string, unknown>,
-      submitOptions?: SubmitOptions,
-    ) {
+    async submit(data: Record<string, unknown>, submitOptions?: SubmitOptions) {
       if (!cachedSchema) {
         cachedSchema = await fetchSchema();
       }

@@ -28,17 +28,20 @@ const SCHEMA_RESPONSE = {
 
 function createMockHttpClient(): HttpAdapter {
   return {
-    get: vi.fn(async (): Promise<HttpResponse> => ({
-      status: 200,
-      headers: { get: () => null },
-      json: () => Promise.resolve(SCHEMA_RESPONSE),
-    })),
-    post: vi.fn(async (): Promise<HttpResponse> => ({
-      status: 200,
-      headers: { get: () => null },
-      json: () =>
-        Promise.resolve({ message: "Form submitted successfully." }),
-    })),
+    get: vi.fn(
+      async (): Promise<HttpResponse> => ({
+        status: 200,
+        headers: { get: () => null },
+        json: () => Promise.resolve(SCHEMA_RESPONSE),
+      }),
+    ),
+    post: vi.fn(
+      async (): Promise<HttpResponse> => ({
+        status: 200,
+        headers: { get: () => null },
+        json: () => Promise.resolve({ message: "Form submitted successfully." }),
+      }),
+    ),
   };
 }
 
@@ -92,10 +95,7 @@ describe("createForm", () => {
       httpClient: client,
     });
 
-    await form.submit(
-      { email: "test@example.com" },
-      { botToken: "turnstile-token" },
-    );
+    await form.submit({ email: "test@example.com" }, { botToken: "turnstile-token" });
 
     expect(client.post).toHaveBeenCalledWith(
       "https://formrelay.app/api/v1/form/01abc",

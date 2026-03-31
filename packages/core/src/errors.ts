@@ -4,12 +4,7 @@ export class FormRelayError extends Error {
   status: number;
   detail: string;
 
-  constructor(options: {
-    type: string;
-    title: string;
-    status: number;
-    detail: string;
-  }) {
+  constructor(options: { type: string; title: string; status: number; detail: string }) {
     super(options.detail);
     this.name = "FormRelayError";
     this.type = options.type;
@@ -20,24 +15,14 @@ export class FormRelayError extends Error {
 }
 
 export class HoneypotError extends FormRelayError {
-  constructor(options: {
-    type: string;
-    title: string;
-    status: number;
-    detail: string;
-  }) {
+  constructor(options: { type: string; title: string; status: number; detail: string }) {
     super(options);
     this.name = "HoneypotError";
   }
 }
 
 export class BotProtectionError extends FormRelayError {
-  constructor(options: {
-    type: string;
-    title: string;
-    status: number;
-    detail: string;
-  }) {
+  constructor(options: { type: string; title: string; status: number; detail: string }) {
     super(options);
     this.name = "BotProtectionError";
   }
@@ -60,21 +45,13 @@ export class ValidationError extends FormRelayError {
 }
 
 export class RateLimitError extends FormRelayError {
-  constructor(options: {
-    type: string;
-    title: string;
-    status: number;
-    detail: string;
-  }) {
+  constructor(options: { type: string; title: string; status: number; detail: string }) {
     super(options);
     this.name = "RateLimitError";
   }
 }
 
-export function parseErrorResponse(
-  body: Record<string, unknown>,
-  status: number,
-): FormRelayError {
+export function parseErrorResponse(body: Record<string, unknown>, status: number): FormRelayError {
   const type = (body.type as string) ?? "";
   const title = (body.title as string) ?? "Error";
   const detail = (body.detail as string) ?? "An error occurred";

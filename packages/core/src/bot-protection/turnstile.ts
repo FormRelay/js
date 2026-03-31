@@ -1,33 +1,14 @@
 import type { BotProtectionWidget } from "./types";
 import { loadScript } from "./load-script";
 
-declare global {
-  interface Window {
-    turnstile: {
-      render(
-        container: HTMLElement,
-        options: {
-          sitekey: string;
-          callback: (token: string) => void;
-        },
-      ): string;
-      reset(widgetId: string): void;
-      remove(widgetId: string): void;
-    };
-  }
-}
-
 export interface TurnstileOptions {
   siteKey: string;
   container: HTMLElement;
 }
 
-const TURNSTILE_SCRIPT =
-  "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
-export async function loadTurnstile(
-  options: TurnstileOptions,
-): Promise<BotProtectionWidget> {
+export async function loadTurnstile(options: TurnstileOptions): Promise<BotProtectionWidget> {
   await loadScript(TURNSTILE_SCRIPT);
 
   let resolveToken: ((token: string) => void) | null = null;

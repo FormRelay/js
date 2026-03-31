@@ -59,9 +59,13 @@ describe("createFetchAdapter", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(mockResponse));
 
     const adapter = createFetchAdapter();
-    await adapter.post("https://api.example.com/submit", {}, {
-      headers: { "X-Custom": "value" },
-    });
+    await adapter.post(
+      "https://api.example.com/submit",
+      {},
+      {
+        headers: { "X-Custom": "value" },
+      },
+    );
 
     expect(fetch).toHaveBeenCalledWith("https://api.example.com/submit", {
       method: "POST",

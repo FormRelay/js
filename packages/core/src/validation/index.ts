@@ -11,9 +11,7 @@ export interface ValidationIssue {
   message: string;
 }
 
-export function createValidator(
-  schema: JsonSchema,
-): (data: unknown) => ValidationResult {
+export function createValidator(schema: JsonSchema): (data: unknown) => ValidationResult {
   const validator = new Validator(schema as object, "2020-12");
 
   return (data: unknown): ValidationResult => {

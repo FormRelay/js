@@ -30,9 +30,7 @@ describe("loadScript", () => {
 
     await loadScript("https://example.com/existing.js");
 
-    const scripts = document.querySelectorAll(
-      'script[src="https://example.com/existing.js"]',
-    );
+    const scripts = document.querySelectorAll('script[src="https://example.com/existing.js"]');
     expect(scripts.length).toBe(1);
   });
 

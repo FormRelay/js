@@ -14,11 +14,7 @@ export function createFetchAdapter(): HttpAdapter {
       };
     },
 
-    async post(
-      url: string,
-      body: unknown,
-      options: RequestOptions,
-    ): Promise<HttpResponse> {
+    async post(url: string, body: unknown, options: RequestOptions): Promise<HttpResponse> {
       const response = await fetch(url, {
         method: "POST",
         headers: {

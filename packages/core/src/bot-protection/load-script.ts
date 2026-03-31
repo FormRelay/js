@@ -1,8 +1,6 @@
 export function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const existing = document.querySelector(
-      `script[src="${src}"]`,
-    ) as HTMLScriptElement | null;
+    const existing = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
     if (existing) {
       if (existing.dataset.loaded === "true") {
         resolve();
@@ -22,8 +20,7 @@ export function loadScript(src: string): Promise<void> {
       script.dataset.loaded = "true";
       resolve();
     };
-    script.onerror = () =>
-      reject(new Error(`Failed to load script: ${src}`));
+    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
     document.head.appendChild(script);
   });
 }

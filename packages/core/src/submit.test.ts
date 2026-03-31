@@ -1,9 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import {
-  BotProtectionError,
-  FormRelayError,
-  HoneypotError,
-} from "./errors";
+import { BotProtectionError, FormRelayError, HoneypotError } from "./errors";
 import type { HttpAdapter, HttpResponse } from "./http/types";
 import { submitForm } from "./submit";
 import type { FormSchema } from "./types";
@@ -44,15 +40,10 @@ describe("submitForm", () => {
     const client = createMockHttpClient({
       status: 200,
       headers: { get: () => null },
-      json: () =>
-        Promise.resolve({ message: "Form submitted successfully." }),
+      json: () => Promise.resolve({ message: "Form submitted successfully." }),
     });
 
-    const result = await submitForm(
-      { email: "john@example.com" },
-      BASE_SCHEMA,
-      client,
-    );
+    const result = await submitForm({ email: "john@example.com" }, BASE_SCHEMA, client);
 
     expect(client.post).toHaveBeenCalledWith(
       "https://formrelay.app/api/v1/form/01abc",
@@ -74,8 +65,7 @@ describe("submitForm", () => {
     const client = createMockHttpClient({
       status: 200,
       headers: { get: () => null },
-      json: () =>
-        Promise.resolve({ message: "Form submitted successfully." }),
+      json: () => Promise.resolve({ message: "Form submitted successfully." }),
     });
 
     await submitForm({ email: "john@example.com" }, schema, client);
@@ -177,11 +167,7 @@ describe("submitForm", () => {
         }),
     });
 
-    const result = await submitForm(
-      { email: "john@example.com" },
-      BASE_SCHEMA,
-      client,
-    );
+    const result = await submitForm({ email: "john@example.com" }, BASE_SCHEMA, client);
 
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -201,11 +187,7 @@ describe("submitForm", () => {
         }),
     });
 
-    const result = await submitForm(
-      { email: "john@example.com" },
-      BASE_SCHEMA,
-      client,
-    );
+    const result = await submitForm({ email: "john@example.com" }, BASE_SCHEMA, client);
 
     expect(result.success).toBe(false);
     if (!result.success) {
@@ -225,11 +207,7 @@ describe("submitForm", () => {
         }),
     });
 
-    const result = await submitForm(
-      { email: "john@example.com" },
-      BASE_SCHEMA,
-      client,
-    );
+    const result = await submitForm({ email: "john@example.com" }, BASE_SCHEMA, client);
 
     expect(result.success).toBe(false);
     if (!result.success) {

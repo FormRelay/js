@@ -11,19 +11,16 @@ describe("loadTurnstile", () => {
     capturedCallback = null;
 
     (window as any).turnstile = {
-      render: vi.fn(
-        (_container: HTMLElement, opts: { callback: (t: string) => void }) => {
-          capturedCallback = opts.callback;
-          return "widget-1";
-        },
-      ),
+      render: vi.fn((_container: HTMLElement, opts: { callback: (t: string) => void }) => {
+        capturedCallback = opts.callback;
+        return "widget-1";
+      }),
       reset: vi.fn(),
       remove: vi.fn(),
     };
 
     const script = document.createElement("script");
-    script.src =
-      "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
     script.dataset.loaded = "true";
     document.head.appendChild(script);
   });

@@ -3,3 +3,32 @@ export interface BotProtectionWidget {
   reset(): void;
   remove(): void;
 }
+
+declare global {
+  interface Window {
+    turnstile: {
+      render(
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          callback: (token: string) => void;
+        },
+      ): string;
+      reset(widgetId: string): void;
+      remove(widgetId: string): void;
+    };
+    grecaptcha: {
+      render(
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          callback: (token: string) => void;
+        },
+      ): number;
+      reset(widgetId: number): void;
+      getResponse(widgetId: number): string;
+      ready(callback: () => void): void;
+      execute(siteKey: string, options: { action: string }): Promise<string>;
+    };
+  }
+}

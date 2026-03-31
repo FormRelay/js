@@ -19,8 +19,7 @@ describe("loadRecaptchaV3", () => {
 
   test("loads script with siteKey in URL", async () => {
     const script = document.createElement("script");
-    script.src =
-      "https://www.google.com/recaptcha/api.js?render=6Le-v3-key";
+    script.src = "https://www.google.com/recaptcha/api.js?render=6Le-v3-key";
     script.dataset.loaded = "true";
     document.head.appendChild(script);
 
@@ -31,8 +30,7 @@ describe("loadRecaptchaV3", () => {
 
   test("getToken calls execute with siteKey and action", async () => {
     const script = document.createElement("script");
-    script.src =
-      "https://www.google.com/recaptcha/api.js?render=6Le-v3-key";
+    script.src = "https://www.google.com/recaptcha/api.js?render=6Le-v3-key";
     script.dataset.loaded = "true";
     document.head.appendChild(script);
 
@@ -50,8 +48,7 @@ describe("loadRecaptchaV3", () => {
 
   test("defaults action to submit", async () => {
     const script = document.createElement("script");
-    script.src =
-      "https://www.google.com/recaptcha/api.js?render=6Le-v3-key";
+    script.src = "https://www.google.com/recaptcha/api.js?render=6Le-v3-key";
     script.dataset.loaded = "true";
     document.head.appendChild(script);
 

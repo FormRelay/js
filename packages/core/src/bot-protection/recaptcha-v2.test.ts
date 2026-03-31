@@ -11,22 +11,16 @@ describe("loadRecaptchaV2", () => {
     capturedCallback = null;
 
     (window as any).grecaptcha = {
-      render: vi.fn(
-        (
-          _container: HTMLElement,
-          opts: { callback: (t: string) => void },
-        ) => {
-          capturedCallback = opts.callback;
-          return 0;
-        },
-      ),
+      render: vi.fn((_container: HTMLElement, opts: { callback: (t: string) => void }) => {
+        capturedCallback = opts.callback;
+        return 0;
+      }),
       reset: vi.fn(),
       getResponse: vi.fn(() => ""),
     };
 
     const script = document.createElement("script");
-    script.src =
-      "https://www.google.com/recaptcha/api.js?render=explicit";
+    script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
     script.dataset.loaded = "true";
     document.head.appendChild(script);
   });

@@ -2,9 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import type { HttpAdapter, HttpResponse } from "./http/types";
 import { createSchemaFetcher } from "./schema";
 
-function createMockHttpClient(
-  responses: HttpResponse[],
-): HttpAdapter {
+function createMockHttpClient(responses: HttpResponse[]): HttpAdapter {
   let callIndex = 0;
   return {
     get: vi.fn(async (): Promise<HttpResponse> => {
@@ -71,12 +69,7 @@ describe("createSchemaFetcher", () => {
       },
     ]);
 
-    const getSchema = createSchemaFetcher(
-      "01abc",
-      "https://formrelay.app",
-      "pk_fr_test",
-      client,
-    );
+    const getSchema = createSchemaFetcher("01abc", "https://formrelay.app", "pk_fr_test", client);
     await getSchema();
 
     expect(client.get).toHaveBeenCalledWith(
@@ -98,21 +91,14 @@ describe("createSchemaFetcher", () => {
       },
     ]);
 
-    const getSchema = createSchemaFetcher(
-      "01abc",
-      "https://formrelay.app",
-      "pk_fr_test",
-      client,
-    );
+    const getSchema = createSchemaFetcher("01abc", "https://formrelay.app", "pk_fr_test", client);
     const schema = await getSchema();
 
     expect(schema.id).toBe("01abc");
     expect(schema.name).toBe("Contact Form");
     expect(schema.isActive).toBe(true);
     expect(schema.honeypotField).toBe("_hp_phone");
-    expect(schema.submitUrl).toBe(
-      "https://formrelay.app/api/v1/form/01abc",
-    );
+    expect(schema.submitUrl).toBe("https://formrelay.app/api/v1/form/01abc");
     expect(schema.botProtection).toEqual({
       type: "turnstile",
       siteKey: "0x-test-key",
@@ -131,9 +117,7 @@ describe("createSchemaFetcher", () => {
       { label: "General", value: "general" },
       { label: "Support", value: "support" },
     ]);
-    expect(schema.validationSchema).toEqual(
-      RAW_SCHEMA_RESPONSE.data.validation_schema,
-    );
+    expect(schema.validationSchema).toEqual(RAW_SCHEMA_RESPONSE.data.validation_schema);
   });
 
   test("handles null honeypot and bot protection", async () => {
@@ -149,12 +133,7 @@ describe("createSchemaFetcher", () => {
       },
     ]);
 
-    const getSchema = createSchemaFetcher(
-      "01abc",
-      "https://formrelay.app",
-      "pk_fr_test",
-      client,
-    );
+    const getSchema = createSchemaFetcher("01abc", "https://formrelay.app", "pk_fr_test", client);
     const schema = await getSchema();
 
     expect(schema.honeypotField).toBeNull();
@@ -180,12 +159,7 @@ describe("createSchemaFetcher", () => {
       },
     ]);
 
-    const getSchema = createSchemaFetcher(
-      "01abc",
-      "https://formrelay.app",
-      "pk_fr_test",
-      client,
-    );
+    const getSchema = createSchemaFetcher("01abc", "https://formrelay.app", "pk_fr_test", client);
 
     const first = await getSchema();
     const second = await getSchema();
@@ -193,11 +167,8 @@ describe("createSchemaFetcher", () => {
     expect(first).toEqual(second);
     expect(client.get).toHaveBeenCalledTimes(2);
 
-    const secondCallHeaders = (client.get as ReturnType<typeof vi.fn>).mock
-      .calls[1]![1].headers;
+    const secondCallHeaders = (client.get as ReturnType<typeof vi.fn>).mock.calls[1]![1].headers;
     expect(secondCallHeaders["If-None-Match"]).toBe('"v1"');
-    expect(secondCallHeaders["If-Modified-Since"]).toBe(
-      "Mon, 01 Jan 2026 00:00:00 GMT",
-    );
+    expect(secondCallHeaders["If-Modified-Since"]).toBe("Mon, 01 Jan 2026 00:00:00 GMT");
   });
 });
