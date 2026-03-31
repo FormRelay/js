@@ -1,0 +1,21 @@
+{
+  "name": "@formrelay/vue",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vp pack",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@formrelay/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "vite-plus": "latest",
+    "vue": "latest"
+  },
+  "peerDependencies": {
+    "@formrelay/core": "workspace:*",
+    "vue": "^3.0.0"
+  }
+}

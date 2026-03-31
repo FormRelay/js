@@ -1,0 +1,22 @@
+{
+  "name": "@formrelay/react",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vp pack",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@formrelay/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "latest",
+    "react": "latest",
+    "typescript": "latest",
+    "vite-plus": "latest"
+  },
+  "peerDependencies": {
+    "@formrelay/core": "workspace:*",
+    "react": "^18.0.0 || ^19.0.0"
+  }
+}

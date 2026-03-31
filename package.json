@@ -1,0 +1,12 @@
+{
+  "name": "formrelay-js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vp run -r build",
+    "test": "vp test",
+    "lint": "vp lint",
+    "fmt": "vp fmt"
+  },
+  "packageManager": "pnpm@10.30.3"
+}

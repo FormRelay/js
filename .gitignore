@@ -1,0 +1,25 @@
+node_modules/
+dist/
+.output/
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Env / secrets
+.env
+.env.*
+
+# Local claude config
+.claude/settings.local.json
+.mcp.json
+
+# Logs
+*.log
+
+# Coverage
+coverage/

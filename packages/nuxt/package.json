@@ -1,0 +1,23 @@
+{
+  "name": "@formrelay/nuxt",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./dist/module.mjs",
+  "scripts": {
+    "build": "nuxt-module-build build",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@formrelay/vue": "workspace:*",
+    "@nuxt/kit": "latest"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "latest",
+    "nuxt": "latest",
+    "typescript": "latest",
+    "vite-plus": "latest"
+  },
+  "peerDependencies": {
+    "nuxt": "^3.0.0"
+  }
+}
