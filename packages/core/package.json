@@ -10,6 +10,18 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
+    "./recaptcha-v2": {
+      "import": "./dist/recaptcha-v2.mjs",
+      "require": "./dist/recaptcha-v2.cjs"
+    },
+    "./recaptcha-v3": {
+      "import": "./dist/recaptcha-v3.mjs",
+      "require": "./dist/recaptcha-v3.cjs"
+    },
+    "./turnstile": {
+      "import": "./dist/turnstile.mjs",
+      "require": "./dist/turnstile.cjs"
+    },
     "./validation": {
       "import": "./dist/validation.mjs",
       "require": "./dist/validation.cjs"
@@ -21,6 +33,7 @@
     "test": "vp test"
   },
   "devDependencies": {
+    "jsdom": "^29.0.1",
     "typescript": "latest",
     "vite-plus": "latest"
   },
