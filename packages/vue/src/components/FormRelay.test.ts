@@ -75,14 +75,12 @@ describe("FormRelay", () => {
       props: {
         formId: "form-123",
         publicKey: "pk_fr_abc",
-        baseUrl: "https://custom.api.com",
       },
       slots: { default: () => h("div") },
     });
 
     expect(createForm).toHaveBeenCalledWith("form-123", {
       publicKey: "pk_fr_abc",
-      baseUrl: "https://custom.api.com",
     });
   });
 

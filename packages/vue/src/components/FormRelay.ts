@@ -7,7 +7,6 @@ export default defineComponent({
   props: {
     formId: { type: String, required: true },
     publicKey: { type: String, required: true },
-    baseUrl: { type: String, default: undefined },
     validate: { type: Function, default: undefined },
     onSuccess: { type: Function, default: undefined },
     onError: { type: Function, default: undefined },

@@ -36,7 +36,6 @@ export async function useFormRelay(options: Partial<UseFormRelayOptions> & { for
   const runtimeConfig = useRuntimeConfig();
   const config = runtimeConfig.public.formrelay as {
     publicKey: string;
-    baseUrl: string;
   };
 
   const secretKey = (runtimeConfig as Record<string, unknown>).formrelaySecretKey as
@@ -44,17 +43,14 @@ export async function useFormRelay(options: Partial<UseFormRelayOptions> & { for
     | undefined;
 
   const publicKey = options.publicKey ?? config.publicKey;
-  const baseUrl = options.baseUrl ?? config.baseUrl;
 
-  // For SSR schema fetch: use secret key adapter if configured (server-only)
   const schemaClient =
     import.meta.server && secretKey
       ? createForm(options.formId, {
           publicKey,
-          baseUrl,
           httpClient: createSecretKeyAdapter(secretKey),
         })
-      : createForm(options.formId, { publicKey, baseUrl });
+      : createForm(options.formId, { publicKey });
 
   const { data: initialSchema } = await useAsyncData(`formrelay-schema-${options.formId}`, () =>
     schemaClient.getSchema(),
@@ -63,7 +59,6 @@ export async function useFormRelay(options: Partial<UseFormRelayOptions> & { for
   return useVueFormRelay({
     formId: options.formId,
     publicKey,
-    baseUrl,
     initialSchema: initialSchema.value ?? undefined,
     validate: options.validate,
     onSuccess: options.onSuccess,

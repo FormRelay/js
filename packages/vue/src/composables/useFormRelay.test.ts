@@ -1,6 +1,6 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { nextTick, isRef, isReactive } from "vue";
-import { createForm, ValidationError } from "@formrelay/core";
+import { ValidationError } from "@formrelay/core";
 import { useFormRelay } from "./useFormRelay";
 
 const mockFields = [
@@ -304,19 +304,6 @@ describe("useFormRelay", () => {
     await submit();
 
     expect(mockSubmit).not.toHaveBeenCalled();
-  });
-
-  test("passes baseUrl to createForm", () => {
-    useFormRelay({
-      formId: "01abc",
-      publicKey: "pk_fr_test",
-      baseUrl: "https://custom.api.com",
-    });
-
-    expect(createForm).toHaveBeenCalledWith("01abc", {
-      publicKey: "pk_fr_test",
-      baseUrl: "https://custom.api.com",
-    });
   });
 
   test("canSubmit is false while bot protection token is missing", () => {

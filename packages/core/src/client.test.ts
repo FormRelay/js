@@ -108,7 +108,7 @@ describe("createForm", () => {
     );
   });
 
-  test("uses default baseUrl when not provided", async () => {
+  test("uses hardcoded API base URL", async () => {
     const client = createMockHttpClient();
     const form = createForm("01abc", {
       publicKey: "pk_fr_test",
@@ -119,22 +119,6 @@ describe("createForm", () => {
 
     expect(client.get).toHaveBeenCalledWith(
       "https://formrelay.app/api/v1/form/01abc/schema",
-      expect.any(Object),
-    );
-  });
-
-  test("uses custom baseUrl when provided", async () => {
-    const client = createMockHttpClient();
-    const form = createForm("01abc", {
-      publicKey: "pk_fr_test",
-      baseUrl: "https://custom.api.com",
-      httpClient: client,
-    });
-
-    await form.getSchema();
-
-    expect(client.get).toHaveBeenCalledWith(
-      "https://custom.api.com/api/v1/form/01abc/schema",
       expect.any(Object),
     );
   });
