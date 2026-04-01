@@ -31,7 +31,11 @@ export function runTokenLoop(
     }
   }
 
-  loop();
+  loop().catch((error) => {
+    if (!stopped) {
+      onError?.(error);
+    }
+  });
 
   return {
     stop() {

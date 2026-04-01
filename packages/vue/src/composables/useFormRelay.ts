@@ -1,8 +1,7 @@
 import { ref, reactive, computed, watch } from "vue";
-import { createForm, ValidationError } from "@formrelay/core";
+import { createForm, FormRelayError, ValidationError } from "@formrelay/core";
 import type {
   FormSchema,
-  FormRelayError,
   JsonSchema,
   BotProtection,
   FormField,
@@ -61,7 +60,15 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
       schema.value = loadedSchema;
       initializeValues(loadedSchema);
     } catch (error) {
-      schemaError.value = error as FormRelayError;
+      schemaError.value =
+        error instanceof FormRelayError
+          ? error
+          : new FormRelayError({
+              type: "",
+              title: "Unexpected error",
+              status: 0,
+              detail: error instanceof Error ? error.message : String(error),
+            });
     } finally {
       schemaLoading.value = false;
     }

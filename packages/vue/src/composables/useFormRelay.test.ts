@@ -181,7 +181,8 @@ describe("useFormRelay", () => {
     await nextTick();
 
     expect(schemaLoading.value).toBe(false);
-    expect(schemaError.value).toBe(error);
+    expect(schemaError.value).toBeInstanceOf(Error);
+    expect(schemaError.value?.detail).toBe("fetch failed");
   });
 
   test("submit sends values to core", async () => {
@@ -610,5 +611,89 @@ describe("auto bot protection", () => {
     // Manual flow still works
     result.setBotToken("manual-token");
     expect(result.canSubmit.value).toBe(true);
+  });
+
+  test("reset during active auto bot protection clears token and resets widget", async () => {
+    const container = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container);
+
+    const { runTokenLoop } = await import("@formrelay/core/bot-protection");
+    // Simulate token loop calling setBotToken
+    vi.mocked(runTokenLoop).mockImplementation((_widget, onToken) => {
+      onToken("auto-token");
+      return mockTokenLoopHandle;
+    });
+
+    const { result } = mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    expect(result.canSubmit.value).toBe(true);
+
+    result.reset();
+
+    expect(result.canSubmit.value).toBe(false);
+    expect(mockBotWidget.reset).toHaveBeenCalled();
+  });
+
+  test("reinitializes widget and token loop when container ref changes", async () => {
+    const container1 = document.createElement("div");
+    const container2 = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container1);
+
+    mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    const { loadBotProtectionWidget, runTokenLoop } = await import("@formrelay/core/bot-protection");
+    expect(runTokenLoop).toHaveBeenCalledTimes(1);
+
+    containerRef.value = null;
+    await flushPromises();
+
+    containerRef.value = container2;
+    await flushPromises();
+
+    expect(loadBotProtectionWidget).toHaveBeenCalledTimes(2);
+    expect(runTokenLoop).toHaveBeenCalledTimes(2);
+  });
+
+  test("clears botToken when container is destroyed via v-if", async () => {
+    const container = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container);
+
+    const { runTokenLoop } = await import("@formrelay/core/bot-protection");
+    vi.mocked(runTokenLoop).mockImplementation((_widget, onToken) => {
+      onToken("auto-token");
+      return mockTokenLoopHandle;
+    });
+
+    const { result } = mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    expect(result.canSubmit.value).toBe(true);
+
+    // Simulate v-if destroying the container
+    containerRef.value = null;
+    await flushPromises();
+
+    expect(result.canSubmit.value).toBe(false);
+    expect(mockTokenLoopHandle.stop).toHaveBeenCalled();
   });
 });
