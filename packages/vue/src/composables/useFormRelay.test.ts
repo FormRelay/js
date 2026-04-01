@@ -1,5 +1,6 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
-import { nextTick, isRef, isReactive } from "vue";
+import { mount, flushPromises } from "@vue/test-utils";
+import { nextTick, isRef, isReactive, defineComponent, ref } from "vue";
 import { ValidationError } from "@formrelay/core";
 import { useFormRelay } from "./useFormRelay";
 
@@ -59,6 +60,21 @@ vi.mock("@formrelay/core", async (importOriginal) => {
   };
 });
 
+const mockBotWidget = {
+  getToken: vi.fn(),
+  reset: vi.fn(),
+  remove: vi.fn(),
+};
+
+const mockTokenLoopHandle = {
+  stop: vi.fn(),
+};
+
+vi.mock("@formrelay/core/bot-protection", () => ({
+  loadBotProtectionWidget: vi.fn().mockResolvedValue(mockBotWidget),
+  runTokenLoop: vi.fn().mockReturnValue(mockTokenLoopHandle),
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockGetSchema.mockResolvedValue(mockSchema);
@@ -66,7 +82,24 @@ beforeEach(() => {
     success: true,
     message: "Form submitted successfully.",
   });
+  mockBotWidget.getToken.mockReset();
+  mockBotWidget.reset.mockReset();
+  mockBotWidget.remove.mockReset();
+  mockTokenLoopHandle.stop.mockReset();
 });
+
+function mountComposable(options: Parameters<typeof useFormRelay>[0]) {
+  let result!: ReturnType<typeof useFormRelay>;
+  const wrapper = mount(
+    defineComponent({
+      setup() {
+        result = useFormRelay(options);
+        return () => null;
+      },
+    }),
+  );
+  return { result, wrapper };
+}
 
 describe("useFormRelay", () => {
   test("returns reactive refs and computed values", () => {
@@ -409,5 +442,147 @@ describe("useFormRelay", () => {
       { email: "john@example.com", name: "" },
       { botToken: "new-token" },
     );
+  });
+});
+
+describe("auto bot protection", () => {
+  test("loads widget and starts token loop when container and schema are available", async () => {
+    const container = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container);
+
+    mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    const { loadBotProtectionWidget, runTokenLoop } = await import("@formrelay/core/bot-protection");
+    expect(loadBotProtectionWidget).toHaveBeenCalledWith(
+      { type: "turnstile", siteKey: "0x-key" },
+      container,
+    );
+    expect(runTokenLoop).toHaveBeenCalledWith(mockBotWidget, expect.any(Function));
+  });
+
+  test("does not load widget when container is null", async () => {
+    const containerRef = ref<HTMLElement | null>(null);
+
+    mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    const { loadBotProtectionWidget } = await import("@formrelay/core/bot-protection");
+    expect(loadBotProtectionWidget).not.toHaveBeenCalled();
+  });
+
+  test("does not load widget when schema has no bot protection", async () => {
+    const container = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container);
+
+    mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchema,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    const { loadBotProtectionWidget } = await import("@formrelay/core/bot-protection");
+    expect(loadBotProtectionWidget).not.toHaveBeenCalled();
+  });
+
+  test("reset calls widget.reset() when auto bot protection is active", async () => {
+    const container = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container);
+
+    const { result } = mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    result.reset();
+
+    expect(mockBotWidget.reset).toHaveBeenCalled();
+  });
+
+  test("cleans up widget on unmount", async () => {
+    const container = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container);
+
+    const { wrapper } = mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    wrapper.unmount();
+
+    expect(mockTokenLoopHandle.stop).toHaveBeenCalled();
+  });
+
+  test("reinitializes widget when container ref changes", async () => {
+    const container1 = document.createElement("div");
+    const container2 = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container1);
+
+    mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    const { loadBotProtectionWidget } = await import("@formrelay/core/bot-protection");
+    expect(loadBotProtectionWidget).toHaveBeenCalledTimes(1);
+
+    // Simulate v-if: container destroyed and recreated
+    containerRef.value = null;
+    await flushPromises();
+
+    expect(mockTokenLoopHandle.stop).toHaveBeenCalledTimes(1);
+
+    containerRef.value = container2;
+    await flushPromises();
+
+    expect(loadBotProtectionWidget).toHaveBeenCalledTimes(2);
+    expect(loadBotProtectionWidget).toHaveBeenLastCalledWith(
+      { type: "turnstile", siteKey: "0x-key" },
+      container2,
+    );
+  });
+
+  test("without botProtectionContainer, existing behavior is unchanged", async () => {
+    const { result } = mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+    });
+
+    await flushPromises();
+
+    const { loadBotProtectionWidget } = await import("@formrelay/core/bot-protection");
+    expect(loadBotProtectionWidget).not.toHaveBeenCalled();
+
+    // Manual flow still works
+    result.setBotToken("manual-token");
+    expect(result.canSubmit.value).toBe(true);
   });
 });
