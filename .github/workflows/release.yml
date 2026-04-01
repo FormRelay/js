@@ -23,6 +23,8 @@ jobs:
 
       - run: vp install
 
+      - run: npm install -g typescript
+
       - run: vp run -r build
 
       - name: Create release PR or publish
