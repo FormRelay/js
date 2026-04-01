@@ -38,13 +38,12 @@
     "build": "vp pack",
     "test": "vp test"
   },
+  "dependencies": {
+    "@cfworker/json-schema": "^4.1.1"
+  },
   "devDependencies": {
-    "@cfworker/json-schema": "^4.1.1",
     "jsdom": "^29.0.1",
     "typescript": "latest",
     "vite-plus": "latest"
-  },
-  "optionalDependencies": {
-    "@cfworker/json-schema": "^4.1.1"
   }
 }
