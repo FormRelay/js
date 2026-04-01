@@ -5,6 +5,10 @@ import { createCallbackWidget } from "./create-widget";
 export interface TurnstileOptions {
   siteKey: string;
   container: HTMLElement;
+  theme?: "light" | "dark" | "auto";
+  appearance?: "always" | "execute" | "interaction-only";
+  language?: string;
+  size?: "normal" | "compact" | "flexible";
 }
 
 const TURNSTILE_SCRIPT = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
@@ -26,6 +30,10 @@ export async function loadTurnstile(options: TurnstileOptions): Promise<BotProte
         callback: callbacks.onToken,
         "error-callback": () => callbacks.onError(new Error("Turnstile challenge failed.")),
         "expired-callback": callbacks.onExpired,
+        theme: options.theme,
+        appearance: options.appearance,
+        language: options.language,
+        size: options.size,
       });
 
       return {

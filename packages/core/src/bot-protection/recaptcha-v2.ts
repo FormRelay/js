@@ -5,6 +5,9 @@ import { createCallbackWidget } from "./create-widget";
 export interface RecaptchaV2Options {
   siteKey: string;
   container: HTMLElement;
+  theme?: "light" | "dark";
+  size?: "compact" | "normal";
+  tabindex?: number;
 }
 
 const RECAPTCHA_SCRIPT = "https://www.google.com/recaptcha/api.js?render=explicit";
@@ -26,6 +29,9 @@ export async function loadRecaptchaV2(options: RecaptchaV2Options): Promise<BotP
         callback: callbacks.onToken,
         "error-callback": () => callbacks.onError(new Error("reCAPTCHA challenge failed.")),
         "expired-callback": callbacks.onExpired,
+        theme: options.theme,
+        size: options.size,
+        tabindex: options.tabindex,
       });
 
       return {

@@ -14,6 +14,10 @@ declare global {
           callback: (token: string) => void;
           "error-callback"?: () => void;
           "expired-callback"?: () => void;
+          theme?: "light" | "dark" | "auto";
+          appearance?: "always" | "execute" | "interaction-only";
+          language?: string;
+          size?: "normal" | "compact" | "flexible";
         },
       ): string;
       reset(widgetId: string): void;
@@ -27,6 +31,9 @@ declare global {
           callback: (token: string) => void;
           "error-callback"?: () => void;
           "expired-callback"?: () => void;
+          theme?: "light" | "dark";
+          size?: "compact" | "normal";
+          tabindex?: number;
         },
       ): number;
       reset(widgetId: number): void;
