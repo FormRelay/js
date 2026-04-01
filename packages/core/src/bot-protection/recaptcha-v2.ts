@@ -1,5 +1,6 @@
 import type { BotProtectionWidget } from "./types";
 import { loadScript } from "./load-script";
+import { createCallbackWidget } from "./create-widget";
 
 export interface RecaptchaV2Options {
   siteKey: string;
@@ -18,49 +19,23 @@ export async function loadRecaptchaV2(options: RecaptchaV2Options): Promise<BotP
     );
   }
 
-  let resolveToken: ((token: string) => void) | null = null;
-  let rejectToken: ((error: Error) => void) | null = null;
-  let currentToken: string | null = null;
+  return createCallbackWidget({
+    render(callbacks) {
+      const widgetId = window.grecaptcha.render(options.container, {
+        sitekey: options.siteKey,
+        callback: callbacks.onToken,
+        "error-callback": () => callbacks.onError(new Error("reCAPTCHA challenge failed.")),
+        "expired-callback": callbacks.onExpired,
+      });
 
-  const widgetId = window.grecaptcha.render(options.container, {
-    sitekey: options.siteKey,
-    callback: (token: string) => {
-      currentToken = token;
-      if (resolveToken) {
-        resolveToken(token);
-        resolveToken = null;
-        rejectToken = null;
-      }
-    },
-    "error-callback": () => {
-      currentToken = null;
-      if (rejectToken) {
-        rejectToken(new Error("reCAPTCHA challenge failed."));
-        resolveToken = null;
-        rejectToken = null;
-      }
-    },
-    "expired-callback": () => {
-      currentToken = null;
+      return {
+        reset: () => window.grecaptcha.reset(widgetId),
+        remove: () => {
+          while (options.container.firstChild) {
+            options.container.removeChild(options.container.firstChild);
+          }
+        },
+      };
     },
   });
-
-  return {
-    getToken(): Promise<string> {
-      if (currentToken) return Promise.resolve(currentToken);
-      return new Promise((resolve, reject) => {
-        resolveToken = resolve;
-        rejectToken = reject;
-      });
-    },
-    reset() {
-      currentToken = null;
-      window.grecaptcha.reset(widgetId);
-    },
-    remove() {
-      while (options.container.firstChild) {
-        options.container.removeChild(options.container.firstChild);
-      }
-    },
-  };
 }

@@ -1,5 +1,6 @@
 import type { BotProtectionWidget } from "./types";
 import { loadScript } from "./load-script";
+import { createCallbackWidget } from "./create-widget";
 
 export interface TurnstileOptions {
   siteKey: string;
@@ -18,47 +19,19 @@ export async function loadTurnstile(options: TurnstileOptions): Promise<BotProte
     );
   }
 
-  let resolveToken: ((token: string) => void) | null = null;
-  let rejectToken: ((error: Error) => void) | null = null;
-  let currentToken: string | null = null;
+  return createCallbackWidget({
+    render(callbacks) {
+      const widgetId = window.turnstile.render(options.container, {
+        sitekey: options.siteKey,
+        callback: callbacks.onToken,
+        "error-callback": () => callbacks.onError(new Error("Turnstile challenge failed.")),
+        "expired-callback": callbacks.onExpired,
+      });
 
-  const widgetId = window.turnstile.render(options.container, {
-    sitekey: options.siteKey,
-    callback: (token: string) => {
-      currentToken = token;
-      if (resolveToken) {
-        resolveToken(token);
-        resolveToken = null;
-        rejectToken = null;
-      }
-    },
-    "error-callback": () => {
-      currentToken = null;
-      if (rejectToken) {
-        rejectToken(new Error("Turnstile challenge failed."));
-        resolveToken = null;
-        rejectToken = null;
-      }
-    },
-    "expired-callback": () => {
-      currentToken = null;
+      return {
+        reset: () => window.turnstile.reset(widgetId),
+        remove: () => window.turnstile.remove(widgetId),
+      };
     },
   });
-
-  return {
-    getToken(): Promise<string> {
-      if (currentToken) return Promise.resolve(currentToken);
-      return new Promise((resolve, reject) => {
-        resolveToken = resolve;
-        rejectToken = reject;
-      });
-    },
-    reset() {
-      currentToken = null;
-      window.turnstile.reset(widgetId);
-    },
-    remove() {
-      window.turnstile.remove(widgetId);
-    },
-  };
 }

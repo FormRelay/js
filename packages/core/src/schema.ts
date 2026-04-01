@@ -1,4 +1,5 @@
 import type { HttpAdapter } from "./http/types";
+import { parseJsonSafe } from "./http/parse-json";
 import type { BotProtection, FormField, FormSchema } from "./types";
 import { FormRelayError, parseErrorResponse } from "./errors";
 
@@ -60,10 +61,8 @@ export function createSchemaFetcher(
     }
 
     if (response.status < 200 || response.status >= 300) {
-      let errorBody: Record<string, unknown>;
-      try {
-        errorBody = (await response.json()) as Record<string, unknown>;
-      } catch {
+      const errorBody = await parseJsonSafe(response);
+      if (!errorBody) {
         throw new FormRelayError({
           type: "",
           title: "Schema Fetch Failed",

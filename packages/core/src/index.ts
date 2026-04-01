@@ -9,6 +9,7 @@ export type {
   SubmitOptions,
 } from "./types";
 export type { SubmitResult } from "./submit";
+export type { ErrorOptions } from "./errors";
 export {
   BotProtectionError,
   FormRelayError,

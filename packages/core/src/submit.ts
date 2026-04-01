@@ -1,4 +1,5 @@
 import type { HttpAdapter } from "./http/types";
+import { parseJsonSafe } from "./http/parse-json";
 import type { FormSchema, SubmitOptions } from "./types";
 import { FormRelayError, parseErrorResponse } from "./errors";
 
@@ -18,47 +19,22 @@ export async function submitForm(
   httpClient: HttpAdapter,
   options?: SubmitOptions,
 ): Promise<SubmitResult> {
-  const body: Record<string, unknown> = { ...data };
-
-  if (schema.honeypotField) {
-    body[schema.honeypotField] = "";
-  }
-
-  if (options?.botToken && schema.botProtection) {
-    const tokenField = BOT_TOKEN_FIELDS[schema.botProtection.type];
-    if (!tokenField) {
-      throw new Error(
-        `Unknown bot protection type "${schema.botProtection.type}". ` +
-          `Supported types: ${Object.keys(BOT_TOKEN_FIELDS).join(", ")}`,
-      );
-    }
-    body[tokenField] = options.botToken;
-  }
+  const body = buildRequestBody(data, schema, options);
 
   const response = await httpClient.post(schema.submitUrl, body, {
     headers: {},
   });
 
   if (response.status >= 200 && response.status < 300) {
-    let json: Record<string, unknown>;
-    try {
-      json = (await response.json()) as Record<string, unknown>;
-    } catch {
-      return {
-        success: true,
-        message: "Form submitted successfully.",
-      };
-    }
+    const json = await parseJsonSafe(response);
     return {
       success: true,
-      message: (json.message as string) ?? "Form submitted successfully.",
+      message: (json?.message as string) ?? "Form submitted successfully.",
     };
   }
 
-  let errorBody: Record<string, unknown>;
-  try {
-    errorBody = (await response.json()) as Record<string, unknown>;
-  } catch {
+  const errorBody = await parseJsonSafe(response);
+  if (!errorBody) {
     return {
       success: false,
       error: new FormRelayError({
@@ -69,8 +45,36 @@ export async function submitForm(
       }),
     };
   }
+
   return {
     success: false,
     error: parseErrorResponse(errorBody, response.status),
   };
+}
+
+function buildRequestBody(
+  data: Record<string, unknown>,
+  schema: FormSchema,
+  options?: SubmitOptions,
+): Record<string, unknown> {
+  const body: Record<string, unknown> = { ...data };
+
+  if (schema.honeypotField) {
+    body[schema.honeypotField] = "";
+  }
+
+  if (!options?.botToken || !schema.botProtection) {
+    return body;
+  }
+
+  const tokenField = BOT_TOKEN_FIELDS[schema.botProtection.type];
+  if (!tokenField) {
+    throw new Error(
+      `Unknown bot protection type "${schema.botProtection.type}". ` +
+        `Supported types: ${Object.keys(BOT_TOKEN_FIELDS).join(", ")}`,
+    );
+  }
+
+  body[tokenField] = options.botToken;
+  return body;
 }
