@@ -27,5 +27,6 @@
   "peerDependencies": {
     "@formrelay/core": "workspace:*",
     "react": "^18.0.0 || ^19.0.0"
-  }
+  },
+  "private": true
 }
