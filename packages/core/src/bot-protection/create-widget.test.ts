@@ -80,4 +80,19 @@ describe("createCallbackWidget", () => {
     // Should not throw when no one is waiting
     expect(() => callbacks.onError(new Error("no listener"))).not.toThrow();
   });
+
+  test("getToken consumes cached token so next call waits", async () => {
+    const { widget, callbacks } = createWidget();
+
+    callbacks.onToken("first-token");
+
+    // First call returns and consumes
+    expect(await widget.getToken()).toBe("first-token");
+
+    // Second call waits for a new token
+    const promise = widget.getToken();
+    callbacks.onToken("second-token");
+
+    expect(await promise).toBe("second-token");
+  });
 });

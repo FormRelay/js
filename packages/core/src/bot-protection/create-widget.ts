@@ -42,7 +42,11 @@ export function createCallbackWidget(config: {
 
   return {
     getToken() {
-      if (currentToken) return Promise.resolve(currentToken);
+      if (currentToken) {
+        const token = currentToken;
+        currentToken = null;
+        return Promise.resolve(token);
+      }
       return new Promise((resolve, reject) => {
         resolveToken = resolve;
         rejectToken = reject;
