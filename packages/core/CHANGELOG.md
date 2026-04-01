@@ -1,5 +1,13 @@
 # @formrelay/core
 
+## 0.1.1
+
+### Patch Changes
+
+- 1da5dd1: Remove `baseUrl` from public API. The FormRelay API URL is now hardcoded. Override via `FORMRELAY_API_URL` env var at build time for local development.
+
+  Nuxt module now supports both Nuxt 3 and Nuxt 4.
+
 ## 1.0.0
 
 ### Minor Changes
