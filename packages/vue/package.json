@@ -38,5 +38,6 @@
   "peerDependencies": {
     "@formrelay/core": "workspace:*",
     "vue": "^3.0.0"
-  }
+  },
+  "license": "MIT"
 }
