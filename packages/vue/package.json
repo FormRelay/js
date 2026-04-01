@@ -10,6 +10,7 @@
     "@formrelay/core": "workspace:*"
   },
   "devDependencies": {
+    "@vue/test-utils": "^2.4.6",
     "typescript": "latest",
     "vite-plus": "latest",
     "vue": "latest"
