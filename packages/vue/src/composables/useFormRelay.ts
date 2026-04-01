@@ -1,5 +1,5 @@
 import { ref, reactive, computed } from "vue";
-import { createForm } from "@formrelay/core";
+import { createForm, ValidationError } from "@formrelay/core";
 import type {
   FormSchema,
   FormRelayError,
@@ -83,6 +83,9 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
         submitted.value = true;
         options.onSuccess?.({ message: result.message });
       } else {
+        if (result.error instanceof ValidationError) {
+          errors.value = result.error.fieldErrors;
+        }
         options.onError?.(result.error);
       }
     } finally {
@@ -96,6 +99,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     }
     errors.value = {};
     submitted.value = false;
+    botToken = null;
   }
 
   function setBotToken(token: string) {

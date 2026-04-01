@@ -26,12 +26,16 @@ const mockSchema = {
   submitUrl: "https://formrelay.app/api/v1/form/01abc",
 };
 
-vi.mock("@formrelay/core", () => ({
-  createForm: vi.fn(() => ({
-    getSchema: vi.fn().mockResolvedValue(mockSchema),
-    submit: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
-  })),
-}));
+vi.mock("@formrelay/core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@formrelay/core")>();
+  return {
+    ...actual,
+    createForm: vi.fn(() => ({
+      getSchema: vi.fn().mockResolvedValue(mockSchema),
+      submit: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
+    })),
+  };
+});
 
 describe("FormRelay", () => {
   test("exposes composable state as slot props", async () => {

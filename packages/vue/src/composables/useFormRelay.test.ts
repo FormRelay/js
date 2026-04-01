@@ -1,6 +1,6 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { nextTick, isRef, isReactive } from "vue";
-import { createForm } from "@formrelay/core";
+import { createForm, ValidationError } from "@formrelay/core";
 import { useFormRelay } from "./useFormRelay";
 
 const mockSchema = {
@@ -41,12 +41,16 @@ const mockSubmit = vi.fn().mockResolvedValue({
   message: "Form submitted successfully.",
 });
 
-vi.mock("@formrelay/core", () => ({
-  createForm: vi.fn(() => ({
-    getSchema: mockGetSchema,
-    submit: mockSubmit,
-  })),
-}));
+vi.mock("@formrelay/core", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@formrelay/core")>();
+  return {
+    ...actual,
+    createForm: vi.fn(() => ({
+      getSchema: mockGetSchema,
+      submit: mockSubmit,
+    })),
+  };
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -304,5 +308,42 @@ describe("useFormRelay", () => {
       publicKey: "pk_fr_test",
       baseUrl: "https://custom.api.com",
     });
+  });
+
+  test("populates errors ref from server-side ValidationError", async () => {
+    const validationError = new ValidationError({
+      type: "https://formrelay.app/errors#validation",
+      title: "Validation Failed",
+      status: 422,
+      detail: "The given data was invalid.",
+      fieldErrors: { email: ["The email field is required."] },
+    });
+    mockSubmit.mockResolvedValueOnce({ success: false, error: validationError });
+
+    const { submit, errors } = useFormRelay({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchema,
+    });
+
+    await submit();
+
+    expect(errors.value).toEqual({ email: ["The email field is required."] });
+  });
+
+  test("reset clears bot token", async () => {
+    const { values, submit, setBotToken, reset } = useFormRelay({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchema,
+    });
+
+    setBotToken("old-token");
+    reset();
+
+    values.email = "john@example.com";
+    await submit();
+
+    expect(mockSubmit).toHaveBeenCalledWith({ email: "john@example.com", name: "" }, {});
   });
 });
