@@ -4,12 +4,12 @@ Official JavaScript/TypeScript SDK packages for [FormRelay](https://formrelay.ap
 
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| [`@formrelay/core`](./packages/core) | Framework-agnostic core client |
-| [`@formrelay/vue`](./packages/vue) | Vue 3 composable + renderless component |
-| [`@formrelay/nuxt`](./packages/nuxt) | Nuxt module with auto-imports and SSR |
-| `@formrelay/react` | React hooks (coming soon) |
+| Package                              | Description                             |
+| ------------------------------------ | --------------------------------------- |
+| [`@formrelay/core`](./packages/core) | Framework-agnostic core client          |
+| [`@formrelay/vue`](./packages/vue)   | Vue 3 composable + renderless component |
+| [`@formrelay/nuxt`](./packages/nuxt) | Nuxt module with auto-imports and SSR   |
+| `@formrelay/react`                   | React hooks (coming soon)               |
 
 ## Documentation
 

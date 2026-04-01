@@ -1,6 +1,7 @@
 {
   "name": "@formrelay/vue",
   "version": "0.1.1",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FormRelay/js.git",
@@ -38,6 +39,5 @@
   "peerDependencies": {
     "@formrelay/core": "workspace:*",
     "vue": "^3.0.0"
-  },
-  "license": "MIT"
+  }
 }

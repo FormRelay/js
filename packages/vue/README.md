@@ -14,11 +14,10 @@ npm install @formrelay/vue @formrelay/core
 <script setup>
 import { useFormRelay } from "@formrelay/vue";
 
-const { fields, values, errors, submit, submitting, submitted, canSubmit } =
-  useFormRelay({
-    formId: "your-form-id",
-    publicKey: "pk_fr_...",
-  });
+const { fields, values, errors, submit, submitting, submitted, canSubmit } = useFormRelay({
+  formId: "your-form-id",
+  publicKey: "pk_fr_...",
+});
 </script>
 
 <template>
