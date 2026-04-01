@@ -1,12 +1,7 @@
-import { ref, reactive, computed } from "vue";
-import { createForm, ValidationError } from "@formrelay/core";
-import type {
-  FormSchema,
-  FormRelayError,
-  JsonSchema,
-  BotProtection,
-  FormField,
-} from "@formrelay/core";
+import { ref, reactive, computed, watch } from "vue";
+import { createForm, FormRelayError, ValidationError } from "@formrelay/core";
+import type { FormSchema, JsonSchema, BotProtection, FormField } from "@formrelay/core";
+import type { BotProtectionWidget } from "@formrelay/core/bot-protection";
 import type { UseFormRelayOptions, UseFormRelayReturn } from "../types";
 
 export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
@@ -60,7 +55,15 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
       schema.value = loadedSchema;
       initializeValues(loadedSchema);
     } catch (error) {
-      schemaError.value = error as FormRelayError;
+      schemaError.value =
+        error instanceof FormRelayError
+          ? error
+          : new FormRelayError({
+              type: "",
+              title: "Unexpected error",
+              status: 0,
+              detail: error instanceof Error ? error.message : String(error),
+            });
     } finally {
       schemaLoading.value = false;
     }
@@ -101,6 +104,9 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     }
   }
 
+  let currentWidget: BotProtectionWidget | null = null;
+  let tokenLoopHandle: { stop: () => void } | null = null;
+
   function reset() {
     for (const key of Object.keys(values)) {
       values[key] = "";
@@ -108,10 +114,51 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     errors.value = {};
     submitted.value = false;
     botToken.value = null;
+    if (currentWidget) {
+      currentWidget.reset();
+    }
   }
 
   function setBotToken(token: string) {
     botToken.value = token;
+  }
+
+  if (options.botProtectionContainer) {
+    watch(
+      [options.botProtectionContainer, botProtection] as const,
+      async ([container, protection], _, onCleanup) => {
+        let cancelled = false;
+        onCleanup(() => {
+          cancelled = true;
+          tokenLoopHandle?.stop();
+          tokenLoopHandle = null;
+          currentWidget = null;
+          botToken.value = null;
+        });
+
+        if (!container || !protection) return;
+
+        try {
+          const { loadBotProtectionWidget, runTokenLoop } =
+            await import("@formrelay/core/bot-protection");
+          if (cancelled) return;
+
+          const widget = await loadBotProtectionWidget(protection, container);
+          if (cancelled) {
+            widget.remove();
+            return;
+          }
+
+          currentWidget = widget;
+          tokenLoopHandle = runTokenLoop(widget, setBotToken);
+        } catch (error) {
+          if (!cancelled) {
+            console.error("[FormRelay] Failed to initialize bot protection:", error);
+          }
+        }
+      },
+      { immediate: true },
+    );
   }
 
   return {

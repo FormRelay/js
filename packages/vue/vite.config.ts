@@ -19,9 +19,10 @@ export default defineConfig({
         return pkg;
       },
     },
-    external: ["vue", "@formrelay/core"],
+    external: ["vue", /^@formrelay\/core/],
   },
   test: {
     include: ["src/**/*.test.ts"],
+    environment: "jsdom",
   },
 });
