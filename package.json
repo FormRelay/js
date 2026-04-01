@@ -3,7 +3,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/FormRelay/js"
+    "url": "https://github.com/FormRelay/js.git"
   },
   "type": "module",
   "scripts": {

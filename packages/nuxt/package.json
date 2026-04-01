@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FormRelay/js",
+    "url": "https://github.com/FormRelay/js.git",
     "directory": "packages/nuxt"
   },
   "type": "module",
