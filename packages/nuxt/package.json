@@ -8,14 +8,15 @@
     "test": "vp test"
   },
   "dependencies": {
+    "@formrelay/core": "workspace:*",
     "@formrelay/vue": "workspace:*",
     "@nuxt/kit": "latest"
   },
   "devDependencies": {
     "@nuxt/module-builder": "latest",
     "nuxt": "latest",
-    "typescript": "latest",
-    "vite-plus": "latest"
+    "vite-plus": "latest",
+    "typescript": "latest"
   },
   "peerDependencies": {
     "nuxt": "^3.0.0"
