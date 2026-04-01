@@ -8,6 +8,7 @@ export default defineConfig({
       turnstile: "src/bot-protection/turnstile.ts",
       "recaptcha-v2": "src/bot-protection/recaptcha-v2.ts",
       "recaptcha-v3": "src/bot-protection/recaptcha-v3.ts",
+      "bot-protection": "src/bot-protection/auto.ts",
     },
     dts: true,
     format: ["esm", "cjs"],

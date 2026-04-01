@@ -17,6 +17,11 @@
       "require": "./dist/index.cjs",
       "types": "./dist/index.d.mts"
     },
+    "./bot-protection": {
+      "import": "./dist/bot-protection.mjs",
+      "require": "./dist/bot-protection.cjs",
+      "types": "./dist/bot-protection.d.mts"
+    },
     "./recaptcha-v2": {
       "import": "./dist/recaptcha-v2.mjs",
       "require": "./dist/recaptcha-v2.cjs",
