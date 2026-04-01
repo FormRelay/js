@@ -27,13 +27,13 @@ if (result.success) {
 
 ## Entrypoints
 
-| Import | Description |
-|--------|-------------|
-| `@formrelay/core` | Main client — schema fetching, submission, error types |
-| `@formrelay/core/validation` | Optional JSON Schema 2020-12 validation |
-| `@formrelay/core/turnstile` | Cloudflare Turnstile widget loader |
-| `@formrelay/core/recaptcha-v2` | Google reCAPTCHA v2 widget loader |
-| `@formrelay/core/recaptcha-v3` | Google reCAPTCHA v3 widget loader |
+| Import                         | Description                                            |
+| ------------------------------ | ------------------------------------------------------ |
+| `@formrelay/core`              | Main client — schema fetching, submission, error types |
+| `@formrelay/core/validation`   | Optional JSON Schema 2020-12 validation                |
+| `@formrelay/core/turnstile`    | Cloudflare Turnstile widget loader                     |
+| `@formrelay/core/recaptcha-v2` | Google reCAPTCHA v2 widget loader                      |
+| `@formrelay/core/recaptcha-v3` | Google reCAPTCHA v3 widget loader                      |
 
 All entrypoints are tree-shakeable — unused code is never bundled.
 

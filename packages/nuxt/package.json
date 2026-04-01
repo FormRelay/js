@@ -1,6 +1,7 @@
 {
   "name": "@formrelay/nuxt",
   "version": "0.1.1",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FormRelay/js.git",
@@ -28,6 +29,5 @@
   },
   "peerDependencies": {
     "nuxt": "^3.0.0 || ^4.0.0"
-  },
-  "license": "MIT"
+  }
 }

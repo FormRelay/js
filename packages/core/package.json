@@ -1,6 +1,7 @@
 {
   "name": "@formrelay/core",
   "version": "0.1.1",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/FormRelay/js.git",
@@ -58,6 +59,5 @@
     "jsdom": "^29.0.1",
     "typescript": "latest",
     "vite-plus": "latest"
-  },
-  "license": "MIT"
+  }
 }

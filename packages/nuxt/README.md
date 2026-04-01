@@ -26,8 +26,9 @@ export default defineNuxtConfig({
 
 ```vue
 <script setup>
-const { fields, values, errors, submit, submitted, canSubmit } =
-  await useFormRelay({ formId: "your-form-id" });
+const { fields, values, errors, submit, submitted, canSubmit } = await useFormRelay({
+  formId: "your-form-id",
+});
 </script>
 
 <template>
