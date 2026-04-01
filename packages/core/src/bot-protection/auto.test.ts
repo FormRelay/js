@@ -21,7 +21,7 @@ vi.mock("./recaptcha-v3", () => ({
   loadRecaptchaV3: vi.fn().mockResolvedValue(mockWidget),
 }));
 
-import { loadBotProtectionWidget } from "./auto";
+import { loadBotProtectionWidget, runTokenLoop } from "./auto";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -64,5 +64,98 @@ describe("loadBotProtectionWidget", () => {
     await expect(
       loadBotProtectionWidget({ type: "unknown" as any, siteKey: "key" }, container),
     ).rejects.toThrow('Unknown bot protection type: "unknown"');
+  });
+});
+
+describe("runTokenLoop", () => {
+  test("calls onToken with initial token from getToken", async () => {
+    const onToken = vi.fn();
+    let resolveToken!: (token: string) => void;
+
+    const widget = {
+      getToken: vi.fn()
+        .mockReturnValueOnce(new Promise<string>((r) => { resolveToken = r; }))
+        .mockReturnValue(new Promise(() => {})),
+      reset: vi.fn(),
+      remove: vi.fn(),
+    };
+
+    runTokenLoop(widget, onToken);
+    resolveToken("token-1");
+
+    await vi.waitFor(() => expect(onToken).toHaveBeenCalledWith("token-1"));
+  });
+
+  test("calls onToken again when a subsequent getToken resolves", async () => {
+    const onToken = vi.fn();
+    let resolveFirst!: (token: string) => void;
+    let resolveSecond!: (token: string) => void;
+
+    const widget = {
+      getToken: vi.fn()
+        .mockReturnValueOnce(new Promise<string>((r) => { resolveFirst = r; }))
+        .mockReturnValueOnce(new Promise<string>((r) => { resolveSecond = r; }))
+        .mockReturnValue(new Promise(() => {})),
+      reset: vi.fn(),
+      remove: vi.fn(),
+    };
+
+    runTokenLoop(widget, onToken);
+
+    resolveFirst("token-1");
+    await vi.waitFor(() => expect(onToken).toHaveBeenCalledWith("token-1"));
+
+    resolveSecond("token-2");
+    await vi.waitFor(() => expect(onToken).toHaveBeenCalledWith("token-2"));
+    expect(onToken).toHaveBeenCalledTimes(2);
+  });
+
+  test("stop breaks the loop and removes widget", async () => {
+    const onToken = vi.fn();
+    const widget = {
+      getToken: vi.fn().mockReturnValue(new Promise(() => {})),
+      reset: vi.fn(),
+      remove: vi.fn(),
+    };
+
+    const handle = runTokenLoop(widget, onToken);
+    handle.stop();
+
+    await vi.waitFor(() => expect(widget.remove).toHaveBeenCalled());
+    expect(onToken).not.toHaveBeenCalled();
+  });
+
+  test("does not call onToken after stop", async () => {
+    const onToken = vi.fn();
+    let resolveToken!: (token: string) => void;
+
+    const widget = {
+      getToken: vi.fn()
+        .mockReturnValueOnce(new Promise<string>((r) => { resolveToken = r; }))
+        .mockReturnValue(new Promise(() => {})),
+      reset: vi.fn(),
+      remove: vi.fn(),
+    };
+
+    const handle = runTokenLoop(widget, onToken);
+    resolveToken("token-1");
+    await vi.waitFor(() => expect(onToken).toHaveBeenCalledWith("token-1"));
+
+    handle.stop();
+    expect(onToken).toHaveBeenCalledTimes(1);
+  });
+
+  test("loop exits when getToken rejects", async () => {
+    const onToken = vi.fn();
+    const widget = {
+      getToken: vi.fn().mockRejectedValue(new Error("widget error")),
+      reset: vi.fn(),
+      remove: vi.fn(),
+    };
+
+    runTokenLoop(widget, onToken);
+
+    await vi.waitFor(() => expect(widget.getToken).toHaveBeenCalled());
+    expect(onToken).not.toHaveBeenCalled();
   });
 });

@@ -1,6 +1,45 @@
 import type { BotProtection } from "../types";
 import type { BotProtectionWidget } from "./types";
 
+export function runTokenLoop(
+  widget: BotProtectionWidget,
+  onToken: (token: string) => void,
+): { stop: () => void } {
+  let stopped = false;
+  let rejectAbort: ((error: Error) => void) | null = null;
+
+  async function loop() {
+    while (!stopped) {
+      try {
+        const token = await Promise.race([
+          widget.getToken(),
+          new Promise<never>((_, reject) => {
+            rejectAbort = reject;
+          }),
+        ]);
+        if (!stopped) {
+          onToken(token);
+        }
+      } catch {
+        break;
+      }
+    }
+  }
+
+  loop();
+
+  return {
+    stop() {
+      stopped = true;
+      if (rejectAbort) {
+        rejectAbort(new Error("Token loop stopped"));
+        rejectAbort = null;
+      }
+      widget.remove();
+    },
+  };
+}
+
 export async function loadBotProtectionWidget(
   config: BotProtection,
   container: HTMLElement,
