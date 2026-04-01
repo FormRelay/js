@@ -1,5 +1,13 @@
 # @formrelay/core
 
+## 0.2.0
+
+### Minor Changes
+
+- 22b536c: Add automatic bot protection. Pass a `botProtectionContainer` ref to `useFormRelay` and the SDK handles widget loading, token acquisition, expiry renewal, reset re-initialization, and cleanup automatically.
+
+  New `@formrelay/core/bot-protection` entrypoint exports `loadBotProtectionWidget` and `runTokenLoop` for framework-agnostic widget lifecycle management.
+
 ## 0.1.1
 
 ### Patch Changes
