@@ -11,6 +11,7 @@ export interface UseFormRelayOptions {
   formId: string;
   publicKey: string;
   initialSchema?: FormSchema;
+  botProtectionContainer?: Ref<HTMLElement | null>;
   validate?: (data: Record<string, unknown>, schema: JsonSchema) => Record<string, string[]>;
   onSuccess?: (result: { message: string }) => void;
   onError?: (error: FormRelayError) => void;
