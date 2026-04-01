@@ -6,9 +6,13 @@
     "build": "vp run -r build",
     "test": "vp run -r test",
     "lint": "vp lint",
-    "fmt": "vp fmt"
+    "fmt": "vp fmt",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.30.0",
     "jsdom": "^29.0.1"
   },
   "packageManager": "pnpm@10.30.3"

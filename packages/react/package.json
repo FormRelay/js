@@ -2,6 +2,10 @@
   "name": "@formrelay/react",
   "version": "0.0.0",
   "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "vp pack",
     "test": "vp test"

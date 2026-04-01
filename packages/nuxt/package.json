@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "type": "module",
   "main": "./dist/module.mjs",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "nuxt-module-build build",
     "test": "vp test"
