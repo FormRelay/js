@@ -7,7 +7,7 @@ import type {
   BotProtection,
   FormField,
 } from "@formrelay/core";
-import type { BotProtectionWidget } from "@formrelay/core/turnstile";
+import type { BotProtectionWidget } from "@formrelay/core/bot-protection";
 import type { UseFormRelayOptions, UseFormRelayReturn } from "../types";
 
 export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
@@ -125,8 +125,6 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     watch(
       [options.botProtectionContainer, botProtection] as const,
       async ([container, protection], _, onCleanup) => {
-        if (!container || !protection) return;
-
         let cancelled = false;
         onCleanup(() => {
           cancelled = true;
@@ -136,19 +134,27 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
           botToken.value = null;
         });
 
-        const { loadBotProtectionWidget, runTokenLoop } = await import(
-          "@formrelay/core/bot-protection"
-        );
-        if (cancelled) return;
+        if (!container || !protection) return;
 
-        const widget = await loadBotProtectionWidget(protection, container);
-        if (cancelled) {
-          widget.remove();
-          return;
+        try {
+          const { loadBotProtectionWidget, runTokenLoop } = await import(
+            "@formrelay/core/bot-protection"
+          );
+          if (cancelled) return;
+
+          const widget = await loadBotProtectionWidget(protection, container);
+          if (cancelled) {
+            widget.remove();
+            return;
+          }
+
+          currentWidget = widget;
+          tokenLoopHandle = runTokenLoop(widget, setBotToken);
+        } catch (error) {
+          if (!cancelled) {
+            console.error("[FormRelay] Failed to initialize bot protection:", error);
+          }
         }
-
-        currentWidget = widget;
-        tokenLoopHandle = runTokenLoop(widget, setBotToken);
       },
       { immediate: true },
     );

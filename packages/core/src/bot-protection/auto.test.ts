@@ -158,4 +158,36 @@ describe("runTokenLoop", () => {
     await vi.waitFor(() => expect(widget.getToken).toHaveBeenCalled());
     expect(onToken).not.toHaveBeenCalled();
   });
+
+  test("calls onError with widget error when getToken rejects", async () => {
+    const onToken = vi.fn();
+    const onError = vi.fn();
+    const widgetError = new Error("challenge failed");
+    const widget = {
+      getToken: vi.fn().mockRejectedValue(widgetError),
+      reset: vi.fn(),
+      remove: vi.fn(),
+    };
+
+    runTokenLoop(widget, onToken, onError);
+
+    await vi.waitFor(() => expect(onError).toHaveBeenCalledWith(widgetError));
+    expect(onToken).not.toHaveBeenCalled();
+  });
+
+  test("does not call onError when stop is called", async () => {
+    const onToken = vi.fn();
+    const onError = vi.fn();
+    const widget = {
+      getToken: vi.fn().mockReturnValue(new Promise(() => {})),
+      reset: vi.fn(),
+      remove: vi.fn(),
+    };
+
+    const handle = runTokenLoop(widget, onToken, onError);
+    handle.stop();
+
+    await vi.waitFor(() => expect(widget.remove).toHaveBeenCalled());
+    expect(onError).not.toHaveBeenCalled();
+  });
 });

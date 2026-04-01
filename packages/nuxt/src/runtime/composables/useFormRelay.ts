@@ -1,3 +1,4 @@
+import { effectScope, onScopeDispose } from "vue";
 import { useFormRelay as useVueFormRelay } from "@formrelay/vue";
 import type { UseFormRelayOptions } from "@formrelay/vue";
 import { createForm } from "@formrelay/core";
@@ -44,6 +45,12 @@ export async function useFormRelay(options: Partial<UseFormRelayOptions> & { for
 
   const publicKey = options.publicKey ?? config.publicKey;
 
+  // Create a scope synchronously (while the component instance is active)
+  // so that watchers inside useVueFormRelay are properly tracked and
+  // cleaned up on unmount, even though we call it after an await.
+  const scope = effectScope();
+  onScopeDispose(() => scope.stop());
+
   const schemaClient =
     import.meta.server && secretKey
       ? createForm(options.formId, {
@@ -56,13 +63,15 @@ export async function useFormRelay(options: Partial<UseFormRelayOptions> & { for
     schemaClient.getSchema(),
   );
 
-  return useVueFormRelay({
-    formId: options.formId,
-    publicKey,
-    initialSchema: initialSchema.value ?? undefined,
-    botProtectionContainer: options.botProtectionContainer,
-    validate: options.validate,
-    onSuccess: options.onSuccess,
-    onError: options.onError,
-  });
+  return scope.run(() =>
+    useVueFormRelay({
+      formId: options.formId,
+      publicKey,
+      initialSchema: initialSchema.value ?? undefined,
+      botProtectionContainer: options.botProtectionContainer,
+      validate: options.validate,
+      onSuccess: options.onSuccess,
+      onError: options.onError,
+    }),
+  )!;
 }

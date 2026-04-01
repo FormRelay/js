@@ -569,6 +569,32 @@ describe("auto bot protection", () => {
     );
   });
 
+  test("handles widget loading failure gracefully", async () => {
+    const container = document.createElement("div");
+    const containerRef = ref<HTMLElement | null>(container);
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { loadBotProtectionWidget } = await import("@formrelay/core/bot-protection");
+    vi.mocked(loadBotProtectionWidget).mockRejectedValueOnce(new Error("Script blocked by ad blocker"));
+
+    const { result } = mountComposable({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      botProtectionContainer: containerRef,
+    });
+
+    await flushPromises();
+
+    expect(result.canSubmit.value).toBe(false);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[FormRelay] Failed to initialize bot protection:",
+      expect.any(Error),
+    );
+
+    consoleSpy.mockRestore();
+  });
+
   test("without botProtectionContainer, existing behavior is unchanged", async () => {
     const { result } = mountComposable({
       formId: "01abc",
