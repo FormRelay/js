@@ -10,25 +10,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
+      - uses: voidzero-dev/setup-vp@v1
         with:
-          node-version: 22
-          cache: pnpm
+          node-version: "22"
+          cache: true
 
-      - run: pnpm install --frozen-lockfile
+      - run: vp install
 
-      - run: pnpm run build
+      - run: vp run -r build
 
       - name: Test core
-        run: cd packages/core && pnpm exec vp test
+        run: cd packages/core && vp test
 
       - name: Test vue
-        run: cd packages/vue && pnpm exec vp test
+        run: cd packages/vue && vp test
 
       - name: Lint
-        run: pnpm exec vp lint
+        run: vp lint
 
       - name: Format check
-        run: pnpm exec vp fmt --check
+        run: vp fmt --check
