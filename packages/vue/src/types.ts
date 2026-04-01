@@ -28,6 +28,7 @@ export interface UseFormRelayReturn {
 
   submitting: Ref<boolean>;
   submitted: Ref<boolean>;
+  canSubmit: ComputedRef<boolean>;
 
   submit: () => Promise<void>;
   reset: () => void;

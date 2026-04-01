@@ -3,36 +3,43 @@ import { nextTick, isRef, isReactive } from "vue";
 import { createForm, ValidationError } from "@formrelay/core";
 import { useFormRelay } from "./useFormRelay";
 
+const mockFields = [
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    isRequired: true,
+    htmlInputType: "email",
+    options: null,
+    helpText: null,
+    order: 0,
+  },
+  {
+    name: "name",
+    label: "Name",
+    type: "text",
+    isRequired: false,
+    htmlInputType: "text",
+    options: null,
+    helpText: null,
+    order: 1,
+  },
+];
+
 const mockSchema = {
   id: "01abc",
   name: "Test Form",
   isActive: true,
-  fields: [
-    {
-      name: "email",
-      label: "Email",
-      type: "email",
-      isRequired: true,
-      htmlInputType: "email",
-      options: null,
-      helpText: null,
-      order: 0,
-    },
-    {
-      name: "name",
-      label: "Name",
-      type: "text",
-      isRequired: false,
-      htmlInputType: "text",
-      options: null,
-      helpText: null,
-      order: 1,
-    },
-  ],
+  fields: mockFields,
   validationSchema: { type: "object" },
   honeypotField: "_hp_phone",
-  botProtection: { type: "turnstile" as const, siteKey: "0x-key" },
+  botProtection: null,
   submitUrl: "https://formrelay.app/api/v1/form/01abc",
+};
+
+const mockSchemaWithBot = {
+  ...mockSchema,
+  botProtection: { type: "turnstile" as const, siteKey: "0x-key" },
 };
 
 const mockGetSchema = vi.fn().mockResolvedValue(mockSchema);
@@ -78,6 +85,8 @@ describe("useFormRelay", () => {
   });
 
   test("fetches schema on init and populates state", async () => {
+    mockGetSchema.mockResolvedValueOnce(mockSchemaWithBot);
+
     const { schema, fields, schemaLoading, botProtection, validationSchema } = useFormRelay({
       formId: "01abc",
       publicKey: "pk_fr_test",
@@ -89,7 +98,7 @@ describe("useFormRelay", () => {
     await nextTick();
 
     expect(schemaLoading.value).toBe(false);
-    expect(schema.value).toEqual(mockSchema);
+    expect(schema.value).toEqual(mockSchemaWithBot);
     expect(fields.value).toHaveLength(2);
     expect(botProtection.value).toEqual({
       type: "turnstile",
@@ -115,12 +124,12 @@ describe("useFormRelay", () => {
     const { schema, schemaLoading, fields, values } = useFormRelay({
       formId: "01abc",
       publicKey: "pk_fr_test",
-      initialSchema: mockSchema,
+      initialSchema: mockSchemaWithBot,
     });
 
     expect(mockGetSchema).not.toHaveBeenCalled();
     expect(schemaLoading.value).toBe(false);
-    expect(schema.value).toEqual(mockSchema);
+    expect(schema.value).toEqual(mockSchemaWithBot);
     expect(fields.value).toHaveLength(2);
     expect(values.email).toBe("");
     expect(values.name).toBe("");
@@ -160,7 +169,7 @@ describe("useFormRelay", () => {
     const { values, submit, setBotToken } = useFormRelay({
       formId: "01abc",
       publicKey: "pk_fr_test",
-      initialSchema: mockSchema,
+      initialSchema: mockSchemaWithBot,
     });
 
     values.email = "john@example.com";
@@ -310,6 +319,67 @@ describe("useFormRelay", () => {
     });
   });
 
+  test("canSubmit is false while bot protection token is missing", () => {
+    const { canSubmit, setBotToken } = useFormRelay({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+    });
+
+    expect(canSubmit.value).toBe(false);
+
+    setBotToken("token");
+    expect(canSubmit.value).toBe(true);
+  });
+
+  test("canSubmit is true when no bot protection is configured", () => {
+    const { canSubmit } = useFormRelay({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchema,
+    });
+
+    expect(canSubmit.value).toBe(true);
+  });
+
+  test("canSubmit is false while submitting", async () => {
+    let resolveSubmit: (v: any) => void;
+    mockSubmit.mockReturnValueOnce(
+      new Promise((r) => {
+        resolveSubmit = r;
+      }),
+    );
+
+    const { submit, canSubmit } = useFormRelay({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchema,
+    });
+
+    expect(canSubmit.value).toBe(true);
+
+    const submitPromise = submit();
+    expect(canSubmit.value).toBe(false);
+
+    resolveSubmit!({ success: true, message: "OK" });
+    await submitPromise;
+
+    expect(canSubmit.value).toBe(true);
+  });
+
+  test("submit is blocked when canSubmit is false", async () => {
+    const { submit } = useFormRelay({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+      initialSchema: mockSchemaWithBot,
+      // no setBotToken called — canSubmit is false
+    });
+
+    await submit();
+
+    expect(mockSubmit).not.toHaveBeenCalled();
+  });
+
   test("populates errors ref from server-side ValidationError", async () => {
     const validationError = new ValidationError({
       type: "https://formrelay.app/errors#validation",
@@ -332,18 +402,25 @@ describe("useFormRelay", () => {
   });
 
   test("reset clears bot token", async () => {
-    const { values, submit, setBotToken, reset } = useFormRelay({
+    const { values, submit, setBotToken, reset, canSubmit } = useFormRelay({
       formId: "01abc",
       publicKey: "pk_fr_test",
-      initialSchema: mockSchema,
+      initialSchema: mockSchemaWithBot,
     });
 
     setBotToken("old-token");
-    reset();
+    expect(canSubmit.value).toBe(true);
 
+    reset();
+    expect(canSubmit.value).toBe(false);
+
+    setBotToken("new-token");
     values.email = "john@example.com";
     await submit();
 
-    expect(mockSubmit).toHaveBeenCalledWith({ email: "john@example.com", name: "" }, {});
+    expect(mockSubmit).toHaveBeenCalledWith(
+      { email: "john@example.com", name: "" },
+      { botToken: "new-token" },
+    );
   });
 });

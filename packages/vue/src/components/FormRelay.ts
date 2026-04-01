@@ -27,6 +27,7 @@ export default defineComponent({
         errors: state.errors.value,
         submitting: state.submitting.value,
         submitted: state.submitted.value,
+        canSubmit: state.canSubmit.value,
         submit: state.submit,
         reset: state.reset,
         setBotToken: state.setBotToken,
