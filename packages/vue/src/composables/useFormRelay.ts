@@ -1,11 +1,6 @@
 import { ref, reactive, computed, watch } from "vue";
 import { createForm, FormRelayError, ValidationError } from "@formrelay/core";
-import type {
-  FormSchema,
-  JsonSchema,
-  BotProtection,
-  FormField,
-} from "@formrelay/core";
+import type { FormSchema, JsonSchema, BotProtection, FormField } from "@formrelay/core";
 import type { BotProtectionWidget } from "@formrelay/core/bot-protection";
 import type { UseFormRelayOptions, UseFormRelayReturn } from "../types";
 
@@ -144,9 +139,8 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
         if (!container || !protection) return;
 
         try {
-          const { loadBotProtectionWidget, runTokenLoop } = await import(
-            "@formrelay/core/bot-protection"
-          );
+          const { loadBotProtectionWidget, runTokenLoop } =
+            await import("@formrelay/core/bot-protection");
           if (cancelled) return;
 
           const widget = await loadBotProtectionWidget(protection, container);

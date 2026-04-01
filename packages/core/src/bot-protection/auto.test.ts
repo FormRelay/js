@@ -54,7 +54,10 @@ describe("loadBotProtectionWidget", () => {
 
   test("returns the widget from the loader", async () => {
     const container = document.createElement("div");
-    const widget = await loadBotProtectionWidget({ type: "turnstile", siteKey: "0x-key" }, container);
+    const widget = await loadBotProtectionWidget(
+      { type: "turnstile", siteKey: "0x-key" },
+      container,
+    );
 
     expect(widget).toBe(mockWidget);
   });
@@ -73,8 +76,13 @@ describe("runTokenLoop", () => {
     let resolveToken!: (token: string) => void;
 
     const widget = {
-      getToken: vi.fn()
-        .mockReturnValueOnce(new Promise<string>((r) => { resolveToken = r; }))
+      getToken: vi
+        .fn()
+        .mockReturnValueOnce(
+          new Promise<string>((r) => {
+            resolveToken = r;
+          }),
+        )
         .mockReturnValue(new Promise(() => {})),
       reset: vi.fn(),
       remove: vi.fn(),
@@ -92,9 +100,18 @@ describe("runTokenLoop", () => {
     let resolveSecond!: (token: string) => void;
 
     const widget = {
-      getToken: vi.fn()
-        .mockReturnValueOnce(new Promise<string>((r) => { resolveFirst = r; }))
-        .mockReturnValueOnce(new Promise<string>((r) => { resolveSecond = r; }))
+      getToken: vi
+        .fn()
+        .mockReturnValueOnce(
+          new Promise<string>((r) => {
+            resolveFirst = r;
+          }),
+        )
+        .mockReturnValueOnce(
+          new Promise<string>((r) => {
+            resolveSecond = r;
+          }),
+        )
         .mockReturnValue(new Promise(() => {})),
       reset: vi.fn(),
       remove: vi.fn(),
@@ -130,8 +147,13 @@ describe("runTokenLoop", () => {
     let resolveToken!: (token: string) => void;
 
     const widget = {
-      getToken: vi.fn()
-        .mockReturnValueOnce(new Promise<string>((r) => { resolveToken = r; }))
+      getToken: vi
+        .fn()
+        .mockReturnValueOnce(
+          new Promise<string>((r) => {
+            resolveToken = r;
+          }),
+        )
         .mockReturnValue(new Promise(() => {})),
       reset: vi.fn(),
       remove: vi.fn(),

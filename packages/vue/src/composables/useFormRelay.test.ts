@@ -460,7 +460,8 @@ describe("auto bot protection", () => {
 
     await flushPromises();
 
-    const { loadBotProtectionWidget, runTokenLoop } = await import("@formrelay/core/bot-protection");
+    const { loadBotProtectionWidget, runTokenLoop } =
+      await import("@formrelay/core/bot-protection");
     expect(loadBotProtectionWidget).toHaveBeenCalledWith(
       { type: "turnstile", siteKey: "0x-key" },
       container,
@@ -576,7 +577,9 @@ describe("auto bot protection", () => {
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const { loadBotProtectionWidget } = await import("@formrelay/core/bot-protection");
-    vi.mocked(loadBotProtectionWidget).mockRejectedValueOnce(new Error("Script blocked by ad blocker"));
+    vi.mocked(loadBotProtectionWidget).mockRejectedValueOnce(
+      new Error("Script blocked by ad blocker"),
+    );
 
     const { result } = mountComposable({
       formId: "01abc",
@@ -655,7 +658,8 @@ describe("auto bot protection", () => {
 
     await flushPromises();
 
-    const { loadBotProtectionWidget, runTokenLoop } = await import("@formrelay/core/bot-protection");
+    const { loadBotProtectionWidget, runTokenLoop } =
+      await import("@formrelay/core/bot-protection");
     expect(runTokenLoop).toHaveBeenCalledTimes(1);
 
     containerRef.value = null;
