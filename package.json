@@ -1,6 +1,10 @@
 {
   "name": "formrelay-js",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormRelay/js"
+  },
   "type": "module",
   "scripts": {
     "build": "vp run -r build",

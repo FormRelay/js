@@ -1,6 +1,11 @@
 {
   "name": "@formrelay/nuxt",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormRelay/js",
+    "directory": "packages/nuxt"
+  },
   "type": "module",
   "main": "./dist/module.mjs",
   "publishConfig": {

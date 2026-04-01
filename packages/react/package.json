@@ -1,6 +1,11 @@
 {
   "name": "@formrelay/react",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FormRelay/js",
+    "directory": "packages/react"
+  },
   "type": "module",
   "publishConfig": {
     "access": "public",
