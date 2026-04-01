@@ -74,11 +74,10 @@ describe("useFormRelay", () => {
   });
 
   test("fetches schema on init and populates state", async () => {
-    const { schema, fields, schemaLoading, botProtection, validationSchema } =
-      useFormRelay({
-        formId: "01abc",
-        publicKey: "pk_fr_test",
-      });
+    const { schema, fields, schemaLoading, botProtection, validationSchema } = useFormRelay({
+      formId: "01abc",
+      publicKey: "pk_fr_test",
+    });
 
     expect(schemaLoading.value).toBe(true);
 
@@ -149,10 +148,7 @@ describe("useFormRelay", () => {
     values.email = "john@example.com";
     await submit();
 
-    expect(mockSubmit).toHaveBeenCalledWith(
-      { email: "john@example.com", name: "" },
-      {},
-    );
+    expect(mockSubmit).toHaveBeenCalledWith({ email: "john@example.com", name: "" }, {});
     expect(submitted.value).toBe(true);
   });
 

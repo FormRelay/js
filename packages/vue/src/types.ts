@@ -12,10 +12,7 @@ export interface UseFormRelayOptions {
   publicKey: string;
   baseUrl?: string;
   initialSchema?: FormSchema;
-  validate?: (
-    data: Record<string, unknown>,
-    schema: JsonSchema,
-  ) => Record<string, string[]>;
+  validate?: (data: Record<string, unknown>, schema: JsonSchema) => Record<string, string[]>;
   onSuccess?: (result: { message: string }) => void;
   onError?: (error: FormRelayError) => void;
 }

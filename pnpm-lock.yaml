@@ -30,6 +30,9 @@ importers:
 
   packages/nuxt:
     dependencies:
+      '@formrelay/core':
+        specifier: workspace:*
+        version: link:../core
       '@formrelay/vue':
         specifier: workspace:*
         version: link:../vue

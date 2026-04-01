@@ -31,9 +31,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
   const validationSchema = computed<JsonSchema | null>(
     () => schema.value?.validationSchema ?? null,
   );
-  const botProtection = computed<BotProtection | null>(
-    () => schema.value?.botProtection ?? null,
-  );
+  const botProtection = computed<BotProtection | null>(() => schema.value?.botProtection ?? null);
 
   function initializeValues(loadedSchema: FormSchema) {
     for (const field of loadedSchema.fields) {
@@ -69,10 +67,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     errors.value = {};
 
     if (options.validate) {
-      const validationErrors = options.validate(
-        { ...values },
-        schema.value.validationSchema,
-      );
+      const validationErrors = options.validate({ ...values }, schema.value.validationSchema);
       if (Object.keys(validationErrors).length > 0) {
         errors.value = validationErrors;
         return;
@@ -82,10 +77,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     submitting.value = true;
 
     try {
-      const result = await client.submit(
-        { ...values },
-        botToken ? { botToken } : {},
-      );
+      const result = await client.submit({ ...values }, botToken ? { botToken } : {});
 
       if (result.success) {
         submitted.value = true;

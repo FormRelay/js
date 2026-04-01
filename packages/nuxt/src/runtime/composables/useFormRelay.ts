@@ -3,9 +3,7 @@ import type { UseFormRelayOptions } from "@formrelay/vue";
 import { createForm } from "@formrelay/core";
 import { useRuntimeConfig, useAsyncData } from "#imports";
 
-export async function useFormRelay(
-  options: Partial<UseFormRelayOptions> & { formId: string },
-) {
+export async function useFormRelay(options: Partial<UseFormRelayOptions> & { formId: string }) {
   const config = useRuntimeConfig().public.formrelay as {
     publicKey: string;
     baseUrl: string;
@@ -16,9 +14,8 @@ export async function useFormRelay(
 
   const client = createForm(options.formId, { publicKey, baseUrl });
 
-  const { data: initialSchema } = await useAsyncData(
-    `formrelay-schema-${options.formId}`,
-    () => client.getSchema(),
+  const { data: initialSchema } = await useAsyncData(`formrelay-schema-${options.formId}`, () =>
+    client.getSchema(),
   );
 
   return useVueFormRelay({

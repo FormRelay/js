@@ -1,9 +1,4 @@
-import {
-  defineNuxtModule,
-  addImports,
-  addComponent,
-  createResolver,
-} from "@nuxt/kit";
+import { defineNuxtModule, addImports, addComponent, createResolver } from "@nuxt/kit";
 
 export interface ModuleOptions {
   publicKey?: string;
