@@ -17,9 +17,9 @@ jobs:
 
       - run: vp install
 
-      - run: npm install -g typescript
-
       - run: vp run -r build
+        env:
+          NODE_PATH: ${{ github.workspace }}/node_modules
 
       - name: Test core
         run: cd packages/core && vp test

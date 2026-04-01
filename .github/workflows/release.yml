@@ -23,9 +23,9 @@ jobs:
 
       - run: vp install
 
-      - run: npm install -g typescript
-
       - run: vp run -r build
+        env:
+          NODE_PATH: ${{ github.workspace }}/node_modules
 
       - name: Create release PR or publish
         uses: changesets/action@v1
