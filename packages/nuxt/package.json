@@ -9,8 +9,7 @@
   "type": "module",
   "main": "./dist/module.mjs",
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "scripts": {
     "build": "nuxt-module-build build",
