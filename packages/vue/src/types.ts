@@ -10,7 +10,6 @@ import type { ComputedRef, Ref } from "vue";
 export interface UseFormRelayOptions {
   formId: string;
   publicKey: string;
-  baseUrl?: string;
   initialSchema?: FormSchema;
   validate?: (data: Record<string, unknown>, schema: JsonSchema) => Record<string, string[]>;
   onSuccess?: (result: { message: string }) => void;

@@ -12,7 +12,6 @@ import type { UseFormRelayOptions, UseFormRelayReturn } from "../types";
 export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
   const client = createForm(options.formId, {
     publicKey: options.publicKey,
-    baseUrl: options.baseUrl,
   });
 
   const schema = ref<FormSchema | null>(null);

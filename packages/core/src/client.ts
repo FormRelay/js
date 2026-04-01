@@ -4,10 +4,10 @@ import type { SubmitResult } from "./submit";
 import { createFetchAdapter } from "./http/fetch";
 import { createSchemaFetcher } from "./schema";
 import { submitForm } from "./submit";
+import { API_BASE_URL } from "./constants";
 
 export interface FormClientOptions {
   publicKey: string;
-  baseUrl?: string;
   httpClient?: HttpAdapter;
 }
 
@@ -17,9 +17,8 @@ export interface FormClient {
 }
 
 export function createForm(formId: string, options: FormClientOptions): FormClient {
-  const baseUrl = options.baseUrl ?? "https://formrelay.app";
   const httpClient = options.httpClient ?? createFetchAdapter();
-  const fetchSchema = createSchemaFetcher(formId, baseUrl, options.publicKey, httpClient);
+  const fetchSchema = createSchemaFetcher(formId, API_BASE_URL, options.publicKey, httpClient);
 
   let cachedSchema: FormSchema | null = null;
 

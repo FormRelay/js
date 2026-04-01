@@ -27,6 +27,6 @@
     "vite-plus": "latest"
   },
   "peerDependencies": {
-    "nuxt": "^3.0.0"
+    "nuxt": "^3.0.0 || ^4.0.0"
   }
 }
