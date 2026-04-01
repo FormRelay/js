@@ -22,6 +22,7 @@ export function createCallbackWidget(config: {
     onToken(token) {
       currentToken = token;
       if (resolveToken) {
+        currentToken = null;
         resolveToken(token);
         resolveToken = null;
         rejectToken = null;
