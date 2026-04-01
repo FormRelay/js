@@ -34,7 +34,7 @@ describe("loadScript", () => {
     expect(scripts.length).toBe(1);
   });
 
-  test("rejects on load error", async () => {
+  test("rejects on load error and removes script from DOM", async () => {
     const promise = loadScript("https://example.com/bad.js");
 
     const script = document.querySelector(
@@ -43,5 +43,8 @@ describe("loadScript", () => {
     script.onerror!(new Event("error"));
 
     await expect(promise).rejects.toThrow("Failed to load script");
+
+    const remaining = document.querySelector('script[src="https://example.com/bad.js"]');
+    expect(remaining).toBeNull();
   });
 });

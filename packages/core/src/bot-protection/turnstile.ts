@@ -1,4 +1,4 @@
-import type { BotProtectionWidget } from "./types";
+export type { BotProtectionWidget } from "./types";
 import { loadScript } from "./load-script";
 import { createCallbackWidget } from "./create-widget";
 
