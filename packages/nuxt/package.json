@@ -8,6 +8,7 @@
     "test": "vp test"
   },
   "dependencies": {
+    "@formrelay/core": "workspace:*",
     "@formrelay/vue": "workspace:*",
     "@nuxt/kit": "latest"
   },
