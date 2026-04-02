@@ -19,6 +19,7 @@ export default defineComponent({
 
       return slots.default({
         schema: state.schema.value,
+        columns: state.columns.value,
         fields: state.fields.value,
         schemaLoading: state.schemaLoading.value,
         schemaError: state.schemaError.value,

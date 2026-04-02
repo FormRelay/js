@@ -31,5 +31,10 @@ export default defineNuxtModule<ModuleOptions>({
       name: "FormRelay",
       filePath: resolver.resolve("./runtime/components/FormRelay"),
     });
+
+    addComponent({
+      name: "FormRelayGrid",
+      filePath: resolver.resolve("./runtime/components/FormRelayGrid"),
+    });
   },
 });

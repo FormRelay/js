@@ -4,6 +4,7 @@ export interface FormSchema {
   id: string;
   name: string;
   isActive: boolean;
+  columns: number;
   fields: FormField[];
   validationSchema: JsonSchema;
   honeypotField: string | null;
@@ -20,6 +21,7 @@ export interface FormField {
   options: FieldOption[] | null;
   helpText: string | null;
   order: number;
+  columnSpan: number;
 }
 
 export interface FieldOption {

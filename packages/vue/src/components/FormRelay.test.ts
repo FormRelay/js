@@ -8,6 +8,7 @@ const mockSchema = {
   id: "01abc",
   name: "Test Form",
   isActive: true,
+  columns: 2,
   fields: [
     {
       name: "email",
@@ -18,6 +19,7 @@ const mockSchema = {
       options: null,
       helpText: null,
       order: 0,
+      columnSpan: 2,
     },
   ],
   validationSchema: { type: "object" },
@@ -55,6 +57,7 @@ describe("FormRelay", () => {
     await nextTick();
 
     expect(slotProps).toBeDefined();
+    expect(slotProps.columns).toBe(2);
     expect(slotProps.fields).toBeDefined();
     expect(slotProps.values).toBeDefined();
     expect(slotProps.errors).toBeDefined();
