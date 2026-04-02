@@ -14,6 +14,7 @@ const mockFields = [
     options: null,
     helpText: null,
     order: 0,
+    columnSpan: 2,
   },
   {
     name: "name",
@@ -24,6 +25,7 @@ const mockFields = [
     options: null,
     helpText: null,
     order: 1,
+    columnSpan: 1,
   },
 ];
 
@@ -31,6 +33,7 @@ const mockSchema = {
   id: "01abc",
   name: "Test Form",
   isActive: true,
+  columns: 2,
   fields: mockFields,
   validationSchema: { type: "object" },
   honeypotField: "_hp_phone",
@@ -120,7 +123,7 @@ describe("useFormRelay", () => {
   test("fetches schema on init and populates state", async () => {
     mockGetSchema.mockResolvedValueOnce(mockSchemaWithBot);
 
-    const { schema, fields, schemaLoading, botProtection, validationSchema } = useFormRelay({
+    const { schema, columns, fields, schemaLoading, botProtection, validationSchema } = useFormRelay({
       formId: "01abc",
       publicKey: "pk_fr_test",
     });
@@ -132,6 +135,7 @@ describe("useFormRelay", () => {
 
     expect(schemaLoading.value).toBe(false);
     expect(schema.value).toEqual(mockSchemaWithBot);
+    expect(columns.value).toBe(2);
     expect(fields.value).toHaveLength(2);
     expect(botProtection.value).toEqual({
       type: "turnstile",

@@ -14,6 +14,7 @@ interface RawSchemaResponse {
     id: string;
     name: string;
     is_active: boolean;
+    columns: number;
     fields: RawFormField[];
     validation_schema: Record<string, unknown>;
     honeypot_field: string | null;
@@ -31,6 +32,7 @@ interface RawFormField {
   options: { label: string; value: string }[] | null;
   help_text: string | null;
   order: number;
+  column_span: number;
 }
 
 export function createSchemaFetcher(
@@ -91,6 +93,7 @@ function transformSchema(raw: RawSchemaResponse["data"]): FormSchema {
     id: raw.id,
     name: raw.name,
     isActive: raw.is_active,
+    columns: raw.columns,
     fields: raw.fields.map(transformField),
     validationSchema: raw.validation_schema,
     honeypotField: raw.honeypot_field,
@@ -114,5 +117,6 @@ function transformField(raw: RawFormField): FormField {
     options: raw.options,
     helpText: raw.help_text,
     order: raw.order,
+    columnSpan: raw.column_span,
   };
 }

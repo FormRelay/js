@@ -20,6 +20,7 @@ const RAW_SCHEMA_RESPONSE = {
     id: "01abc",
     name: "Contact Form",
     is_active: true,
+    columns: 2,
     fields: [
       {
         name: "email",
@@ -30,6 +31,7 @@ const RAW_SCHEMA_RESPONSE = {
         options: null,
         help_text: "Your email",
         order: 0,
+        column_span: 2,
       },
       {
         name: "subject",
@@ -43,6 +45,7 @@ const RAW_SCHEMA_RESPONSE = {
         ],
         help_text: null,
         order: 1,
+        column_span: 1,
       },
     ],
     validation_schema: {
@@ -98,6 +101,7 @@ describe("createSchemaFetcher", () => {
     expect(schema.id).toBe("01abc");
     expect(schema.name).toBe("Contact Form");
     expect(schema.isActive).toBe(true);
+    expect(schema.columns).toBe(2);
     expect(schema.honeypotField).toBe("_hp_phone");
     expect(schema.submitUrl).toBe("https://formrelay.app/api/v1/form/01abc");
     expect(schema.botProtection).toEqual({
@@ -113,6 +117,7 @@ describe("createSchemaFetcher", () => {
       options: null,
       helpText: "Your email",
       order: 0,
+      columnSpan: 2,
     });
     expect(schema.fields[1]!.options).toEqual([
       { label: "General", value: "general" },

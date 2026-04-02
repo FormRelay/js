@@ -19,6 +19,7 @@ export interface UseFormRelayOptions {
 
 export interface UseFormRelayReturn {
   schema: Ref<FormSchema | null>;
+  columns: ComputedRef<number>;
   fields: ComputedRef<FormField[]>;
   schemaLoading: Ref<boolean>;
   schemaError: Ref<FormRelayError | null>;
