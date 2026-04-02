@@ -4,7 +4,11 @@ import type { FormField } from "@formrelay/core";
 export default defineComponent({
   name: "FormRelayGrid",
   props: {
-    columns: { type: Number, default: 2 },
+    columns: {
+      type: Number,
+      default: 2,
+      validator: (v: number) => Number.isInteger(v) && v >= 1,
+    },
     fields: { type: Array as PropType<FormField[]>, required: true },
     tag: { type: String, default: "div" },
   },
@@ -12,16 +16,18 @@ export default defineComponent({
     return () => {
       if (!slots.field) return null;
 
-      const children = props.fields.map((field) =>
-        h(
+      const children = props.fields.map((field) => {
+        const span = Math.min(Math.max(1, field.columnSpan), props.columns);
+
+        return h(
           "div",
           {
             key: field.name,
-            style: { gridColumn: `span ${field.columnSpan}` },
+            style: { gridColumn: `span ${span}` },
           },
-          slots.field({ field }),
-        ),
-      );
+          slots.field!({ field }),
+        );
+      });
 
       return h(
         props.tag,

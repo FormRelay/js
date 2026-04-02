@@ -115,4 +115,41 @@ describe("FormRelayGrid", () => {
 
     expect((wrapper.element as HTMLElement).style.gridTemplateColumns).toBe("repeat(3, 1fr)");
   });
+
+  test("clamps columnSpan to columns when it exceeds the grid", () => {
+    const fields: FormField[] = [{ ...mockFields[0]!, columnSpan: 5 }];
+    const wrapper = mount(FormRelayGrid, {
+      props: { fields, columns: 2 },
+      slots: {
+        field: ({ field }: { field: FormField }) => h("input", { name: field.name }),
+      },
+    });
+
+    expect((wrapper.element.children[0] as HTMLElement).style.gridColumn).toBe("span 2");
+  });
+
+  test("clamps columnSpan to minimum of 1", () => {
+    const fields: FormField[] = [{ ...mockFields[0]!, columnSpan: 0 }];
+    const wrapper = mount(FormRelayGrid, {
+      props: { fields, columns: 2 },
+      slots: {
+        field: ({ field }: { field: FormField }) => h("input", { name: field.name }),
+      },
+    });
+
+    expect((wrapper.element.children[0] as HTMLElement).style.gridColumn).toBe("span 1");
+  });
+
+  test("renders empty grid container when fields array is empty", () => {
+    const wrapper = mount(FormRelayGrid, {
+      props: { fields: [], columns: 2 },
+      slots: {
+        field: ({ field }: { field: FormField }) => h("input", { name: field.name }),
+      },
+    });
+
+    const el = wrapper.element as HTMLElement;
+    expect(el.style.display).toBe("grid");
+    expect(el.children).toHaveLength(0);
+  });
 });

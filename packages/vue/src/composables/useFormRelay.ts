@@ -21,7 +21,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
 
   const botToken = ref<string | null>(null);
 
-  const columns = computed<number>(() => schema.value?.columns ?? 2);
+  const columns = computed<number>(() => schema.value?.columns || 2);
   const fields = computed<FormField[]>(() => schema.value?.fields ?? []);
   const validationSchema = computed<JsonSchema | null>(
     () => schema.value?.validationSchema ?? null,
