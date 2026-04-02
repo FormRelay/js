@@ -123,10 +123,11 @@ describe("useFormRelay", () => {
   test("fetches schema on init and populates state", async () => {
     mockGetSchema.mockResolvedValueOnce(mockSchemaWithBot);
 
-    const { schema, columns, fields, schemaLoading, botProtection, validationSchema } = useFormRelay({
-      formId: "01abc",
-      publicKey: "pk_fr_test",
-    });
+    const { schema, columns, fields, schemaLoading, botProtection, validationSchema } =
+      useFormRelay({
+        formId: "01abc",
+        publicKey: "pk_fr_test",
+      });
 
     expect(schemaLoading.value).toBe(true);
 
