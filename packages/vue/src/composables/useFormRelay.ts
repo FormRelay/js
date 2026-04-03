@@ -79,6 +79,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
 
     errors.value = {};
 
+    // validate requires a schema for the validationSchema — skipped in schema-less mode
     if (schema.value && options.validate) {
       const validationErrors = options.validate({ ...values }, schema.value.validationSchema);
       if (Object.keys(validationErrors).length > 0) {
