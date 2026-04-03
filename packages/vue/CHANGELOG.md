@@ -1,5 +1,29 @@
 # @formrelay/vue
 
+## 0.3.0
+
+### Minor Changes
+
+- 08e8080: Add optional `#loading` and `#error` named slots to the `<FormRelay>` component. The `#loading` slot renders while the schema is being fetched, and the `#error` slot renders when the schema fetch fails (with `{ error }` as slot props). Both are fully backwards compatible — when omitted, the default slot receives `schemaLoading` and `schemaError` as before.
+- 3886dc7: Make `publicKey` optional on the `<FormRelay>` component and `useFormRelay` composable. When omitted, the schema fetch is skipped and the form renders immediately with empty state for manual form building.
+
+  Add `initialSchema` and `botProtectionContainer` as optional props on the Vue `<FormRelay>` component, matching features already available on the composable. All props now use `PropType` for proper template-level type safety.
+
+  Extract shared `renderFormRelay()` helper for consistent slot rendering across packages.
+
+  The Nuxt `<FormRelay>` component is now an async component wrapping the Nuxt `useFormRelay` composable, providing SSR schema prefetch, automatic `publicKey` injection from runtime config, and secret key support. Only `formId` is required. The Nuxt composable now correctly skips the schema fetch when no `publicKey` is configured.
+
+- 705d5b8: Enable form submission without fetching a schema. `publicKey` is now optional on `createForm` — when omitted, `submit()` constructs the URL from `formId` and the API base URL.
+
+  New optional `botProtection` and `honeypotField` options on `createForm`, `useFormRelay`, and the `<FormRelay>` component allow SDK-managed bot protection and honeypot without a schema fetch.
+
+  Users who handle bot protection and honeypot entirely manually can omit these options and include the fields directly in form values.
+
+### Patch Changes
+
+- Updated dependencies [705d5b8]
+  - @formrelay/core@0.3.0
+
 ## 0.2.1
 
 ### Patch Changes
