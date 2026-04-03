@@ -286,4 +286,57 @@ describe("submitForm", () => {
       submitForm({ email: "john@example.com" }, schema, client, { botToken: "token" }),
     ).rejects.toThrow('Unknown bot protection type "unknown_type"');
   });
+
+  test("submits to explicit URL without a schema", async () => {
+    const client = createMockHttpClient({
+      status: 200,
+      headers: { get: () => null },
+      json: () => Promise.resolve({ message: "Form submitted successfully." }),
+    });
+
+    const result = await submitForm(
+      { email: "john@example.com" },
+      { submitUrl: "https://formrelay.app/api/v1/form/01abc" },
+      client,
+    );
+
+    expect(client.post).toHaveBeenCalledWith(
+      "https://formrelay.app/api/v1/form/01abc",
+      { email: "john@example.com" },
+      { headers: {} },
+    );
+    expect(result).toEqual({
+      success: true,
+      message: "Form submitted successfully.",
+    });
+  });
+
+  test("submits without schema using honeypotField and botProtection options", async () => {
+    const client = createMockHttpClient({
+      status: 200,
+      headers: { get: () => null },
+      json: () => Promise.resolve({ message: "OK" }),
+    });
+
+    await submitForm(
+      { email: "john@example.com" },
+      {
+        submitUrl: "https://formrelay.app/api/v1/form/01abc",
+        honeypotField: "_hp_phone",
+        botProtection: { type: "turnstile", siteKey: "0x-key" },
+      },
+      client,
+      { botToken: "turnstile-token" },
+    );
+
+    expect(client.post).toHaveBeenCalledWith(
+      "https://formrelay.app/api/v1/form/01abc",
+      {
+        email: "john@example.com",
+        _hp_phone: "",
+        "cf-turnstile-response": "turnstile-token",
+      },
+      { headers: {} },
+    );
+  });
 });
