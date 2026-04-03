@@ -5,12 +5,12 @@ import type { BotProtectionWidget } from "@formrelay/core/bot-protection";
 import type { UseFormRelayOptions, UseFormRelayReturn } from "../types";
 
 export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
-  const client = createForm(options.formId, {
-    publicKey: options.publicKey,
-  });
+  const client = options.publicKey
+    ? createForm(options.formId, { publicKey: options.publicKey })
+    : null;
 
   const schema = ref<FormSchema | null>(null);
-  const schemaLoading = ref(!options.initialSchema);
+  const schemaLoading = ref(!options.initialSchema && !!options.publicKey);
   const schemaError = ref<FormRelayError | null>(null);
 
   const values = reactive<Record<string, unknown>>({});
@@ -43,7 +43,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
   if (options.initialSchema) {
     schema.value = options.initialSchema;
     initializeValues(options.initialSchema);
-  } else {
+  } else if (options.publicKey) {
     fetchSchema();
   }
 
@@ -52,7 +52,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     schemaError.value = null;
 
     try {
-      const loadedSchema = await client.getSchema();
+      const loadedSchema = await client!.getSchema();
       schema.value = loadedSchema;
       initializeValues(loadedSchema);
     } catch (error) {
@@ -86,7 +86,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     submitting.value = true;
 
     try {
-      const result = await client.submit(
+      const result = await client!.submit(
         { ...values },
         botToken.value ? { botToken: botToken.value } : {},
       );
