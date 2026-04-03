@@ -100,4 +100,99 @@ describe("FormRelay", () => {
     expect(wrapper.find("#test-content").exists()).toBe(true);
     expect(wrapper.find("#test-content").text()).toBe("hello");
   });
+
+  test("renders loading slot while schema is loading", () => {
+    const wrapper = mount(FormRelay, {
+      props: { formId: "01abc", publicKey: "pk_fr_test" },
+      slots: {
+        loading: () => h("div", { id: "loading" }, "Loading..."),
+        default: () => h("div", { id: "form" }, "form content"),
+      },
+    });
+
+    expect(wrapper.find("#loading").exists()).toBe(true);
+    expect(wrapper.find("#form").exists()).toBe(false);
+  });
+
+  test("renders default slot after schema loads when loading slot is provided", async () => {
+    const wrapper = mount(FormRelay, {
+      props: { formId: "01abc", publicKey: "pk_fr_test" },
+      slots: {
+        loading: () => h("div", { id: "loading" }, "Loading..."),
+        default: () => h("div", { id: "form" }, "form content"),
+      },
+    });
+
+    await flushPromises();
+    await nextTick();
+
+    expect(wrapper.find("#loading").exists()).toBe(false);
+    expect(wrapper.find("#form").exists()).toBe(true);
+  });
+
+  test("renders default slot during loading when no loading slot is provided", () => {
+    let slotProps: any;
+
+    mount(FormRelay, {
+      props: { formId: "01abc", publicKey: "pk_fr_test" },
+      slots: {
+        default: (props: any) => {
+          slotProps = props;
+          return h("div");
+        },
+      },
+    });
+
+    expect(slotProps).toBeDefined();
+    expect(slotProps.schemaLoading).toBe(true);
+  });
+
+  test("renders error slot when schema fetch fails", async () => {
+    const { createForm } = await import("@formrelay/core");
+    vi.mocked(createForm).mockReturnValueOnce({
+      getSchema: vi.fn().mockRejectedValue(new Error("Network error")),
+      submit: vi.fn(),
+    } as any);
+
+    const wrapper = mount(FormRelay, {
+      props: { formId: "01abc", publicKey: "pk_fr_test" },
+      slots: {
+        error: (props: any) => h("div", { id: "error" }, props.error.detail),
+        default: () => h("div", { id: "form" }, "form content"),
+      },
+    });
+
+    await flushPromises();
+    await nextTick();
+
+    expect(wrapper.find("#error").exists()).toBe(true);
+    expect(wrapper.find("#error").text()).toBe("Network error");
+    expect(wrapper.find("#form").exists()).toBe(false);
+  });
+
+  test("renders default slot with schemaError when no error slot is provided", async () => {
+    const { createForm } = await import("@formrelay/core");
+    vi.mocked(createForm).mockReturnValueOnce({
+      getSchema: vi.fn().mockRejectedValue(new Error("Network error")),
+      submit: vi.fn(),
+    } as any);
+
+    let slotProps: any;
+
+    mount(FormRelay, {
+      props: { formId: "01abc", publicKey: "pk_fr_test" },
+      slots: {
+        default: (props: any) => {
+          slotProps = props;
+          return h("div");
+        },
+      },
+    });
+
+    await flushPromises();
+    await nextTick();
+
+    expect(slotProps.schemaError).toBeDefined();
+    expect(slotProps.schemaError.detail).toBe("Network error");
+  });
 });
