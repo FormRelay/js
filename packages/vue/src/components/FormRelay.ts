@@ -1,7 +1,6 @@
 import { defineComponent, toRef, type PropType, type Ref } from "vue";
 import { useFormRelay } from "../composables/useFormRelay";
 import { renderFormRelay } from "./renderFormRelay";
-import type { UseFormRelayOptions } from "../types";
 import type { FormRelayError, FormSchema, JsonSchema } from "@formrelay/core";
 
 export default defineComponent({
