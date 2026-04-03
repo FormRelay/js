@@ -15,7 +15,7 @@ export default defineComponent({
     const state = useFormRelay(props as unknown as UseFormRelayOptions);
 
     return () => {
-      if (state.schemaLoading.value && slots.loading) {
+      if (state.schemaLoading.value && !state.schemaError.value && slots.loading) {
         return slots.loading();
       }
 
