@@ -1,4 +1,4 @@
-import { defineComponent } from "vue";
+import { defineComponent, toRef } from "vue";
 import { useFormRelay } from "../composables/useFormRelay";
 import type { UseFormRelayOptions } from "../types";
 
@@ -6,13 +6,25 @@ export default defineComponent({
   name: "FormRelay",
   props: {
     formId: { type: String, required: true },
-    publicKey: { type: String, required: true },
+    publicKey: { type: String, default: undefined },
+    initialSchema: { type: Object, default: undefined },
+    botProtectionContainer: { type: Object, default: undefined },
     validate: { type: Function, default: undefined },
     onSuccess: { type: Function, default: undefined },
     onError: { type: Function, default: undefined },
   },
   setup(props, { slots }) {
-    const state = useFormRelay(props as unknown as UseFormRelayOptions);
+    const state = useFormRelay({
+      formId: props.formId,
+      publicKey: props.publicKey,
+      initialSchema: props.initialSchema,
+      botProtectionContainer: props.botProtectionContainer
+        ? toRef(props, "botProtectionContainer")
+        : undefined,
+      validate: props.validate,
+      onSuccess: props.onSuccess,
+      onError: props.onError,
+    } as UseFormRelayOptions);
 
     return () => {
       if (state.schemaLoading.value && !state.schemaError.value && slots.loading) {

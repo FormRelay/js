@@ -271,4 +271,50 @@ describe("FormRelay", () => {
 
     expect(wrapper.html()).toBe("");
   });
+
+  test("uses initialSchema prop and skips fetch", async () => {
+    const { createForm } = await import("@formrelay/core");
+    const mockGetSchema = vi.fn();
+    vi.mocked(createForm).mockReturnValueOnce({
+      getSchema: mockGetSchema,
+      submit: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
+    } as any);
+
+    let slotProps: any;
+
+    mount(FormRelay, {
+      props: { formId: "01abc", publicKey: "pk_fr_test", initialSchema: mockSchema },
+      slots: {
+        default: (props: any) => {
+          slotProps = props;
+          return h("div");
+        },
+      },
+    });
+
+    await flushPromises();
+    await nextTick();
+
+    expect(mockGetSchema).not.toHaveBeenCalled();
+    expect(slotProps.schemaLoading).toBe(false);
+    expect(slotProps.fields).toHaveLength(1);
+  });
+
+  test("renders default slot immediately when publicKey is omitted", () => {
+    let slotProps: any;
+
+    mount(FormRelay, {
+      props: { formId: "01abc" },
+      slots: {
+        default: (props: any) => {
+          slotProps = props;
+          return h("div");
+        },
+      },
+    });
+
+    expect(slotProps).toBeDefined();
+    expect(slotProps.schemaLoading).toBe(false);
+    expect(slotProps.fields).toEqual([]);
+  });
 });
