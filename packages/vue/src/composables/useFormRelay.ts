@@ -5,9 +5,11 @@ import type { BotProtectionWidget } from "@formrelay/core/bot-protection";
 import type { UseFormRelayOptions, UseFormRelayReturn } from "../types";
 
 export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
-  const client = options.publicKey
-    ? createForm(options.formId, { publicKey: options.publicKey })
-    : null;
+  const client = createForm(options.formId, {
+    publicKey: options.publicKey,
+    botProtection: options.botProtection,
+    honeypotField: options.honeypotField,
+  });
 
   const schema = ref<FormSchema | null>(null);
   const schemaLoading = ref(!options.initialSchema && !!options.publicKey);
@@ -26,7 +28,9 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
   const validationSchema = computed<JsonSchema | null>(
     () => schema.value?.validationSchema ?? null,
   );
-  const botProtection = computed<BotProtection | null>(() => schema.value?.botProtection ?? null);
+  const botProtection = computed<BotProtection | null>(
+    () => schema.value?.botProtection ?? options.botProtection ?? null,
+  );
 
   const canSubmit = computed(() => {
     if (submitting.value) return false;
@@ -52,7 +56,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     schemaError.value = null;
 
     try {
-      const loadedSchema = await client!.getSchema();
+      const loadedSchema = await client.getSchema();
       schema.value = loadedSchema;
       initializeValues(loadedSchema);
     } catch (error) {
@@ -71,11 +75,11 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
   }
 
   async function submit() {
-    if (!client || !schema.value || !canSubmit.value) return;
+    if (!canSubmit.value) return;
 
     errors.value = {};
 
-    if (options.validate) {
+    if (schema.value && options.validate) {
       const validationErrors = options.validate({ ...values }, schema.value.validationSchema);
       if (Object.keys(validationErrors).length > 0) {
         errors.value = validationErrors;

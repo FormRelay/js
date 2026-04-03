@@ -11,6 +11,8 @@ export interface UseFormRelayOptions {
   formId: string;
   publicKey?: string;
   initialSchema?: FormSchema;
+  botProtection?: BotProtection;
+  honeypotField?: string;
   botProtectionContainer?: Ref<HTMLElement | null>;
   validate?: (data: Record<string, unknown>, schema: JsonSchema) => Record<string, string[]>;
   onSuccess?: (result: { message: string }) => void;
