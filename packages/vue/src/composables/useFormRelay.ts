@@ -52,7 +52,8 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     schemaError.value = null;
 
     try {
-      const loadedSchema = await client!.getSchema();
+      if (!client) return;
+      const loadedSchema = await client.getSchema();
       schema.value = loadedSchema;
       initializeValues(loadedSchema);
     } catch (error) {
@@ -71,7 +72,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
   }
 
   async function submit() {
-    if (!schema.value || !canSubmit.value) return;
+    if (!client || !schema.value || !canSubmit.value) return;
 
     errors.value = {};
 
@@ -86,7 +87,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     submitting.value = true;
 
     try {
-      const result = await client!.submit(
+      const result = await client.submit(
         { ...values },
         botToken.value ? { botToken: botToken.value } : {},
       );
