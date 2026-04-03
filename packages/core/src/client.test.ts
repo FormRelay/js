@@ -122,4 +122,65 @@ describe("createForm", () => {
       expect.any(Object),
     );
   });
+
+  test("submit without publicKey uses constructed URL", async () => {
+    const client = createMockHttpClient();
+    const form = createForm("01abc", {
+      httpClient: client,
+    });
+
+    await form.submit({ email: "test@example.com" });
+
+    expect(client.get).not.toHaveBeenCalled();
+    expect(client.post).toHaveBeenCalledWith(
+      "https://formrelay.app/api/v1/form/01abc",
+      { email: "test@example.com" },
+      { headers: {} },
+    );
+  });
+
+  test("submit without schema uses botProtection and honeypotField options", async () => {
+    const client = createMockHttpClient();
+    const form = createForm("01abc", {
+      httpClient: client,
+      botProtection: { type: "turnstile", siteKey: "0x-key" },
+      honeypotField: "_hp_phone",
+    });
+
+    await form.submit({ email: "test@example.com" }, { botToken: "token-123" });
+
+    expect(client.get).not.toHaveBeenCalled();
+    expect(client.post).toHaveBeenCalledWith(
+      "https://formrelay.app/api/v1/form/01abc",
+      {
+        email: "test@example.com",
+        _hp_phone: "",
+        "cf-turnstile-response": "token-123",
+      },
+      { headers: {} },
+    );
+  });
+
+  test("schema values take precedence over options", async () => {
+    const client = createMockHttpClient();
+    const form = createForm("01abc", {
+      publicKey: "pk_fr_test",
+      httpClient: client,
+      honeypotField: "_hp_custom",
+    });
+
+    await form.getSchema();
+    await form.submit({ email: "test@example.com" });
+
+    // Schema has honeypotField: "_hp_phone", options have "_hp_custom"
+    // Schema should win
+    expect(client.post).toHaveBeenCalledWith(
+      "https://formrelay.app/api/v1/form/01abc",
+      {
+        email: "test@example.com",
+        _hp_phone: "",
+      },
+      expect.any(Object),
+    );
+  });
 });
