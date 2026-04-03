@@ -9,7 +9,7 @@ import type { ComputedRef, Ref } from "vue";
 
 export interface UseFormRelayOptions {
   formId: string;
-  publicKey: string;
+  publicKey?: string;
   initialSchema?: FormSchema;
   botProtectionContainer?: Ref<HTMLElement | null>;
   validate?: (data: Record<string, unknown>, schema: JsonSchema) => Record<string, string[]>;

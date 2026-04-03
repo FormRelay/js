@@ -15,7 +15,7 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url);
 
     nuxt.options.runtimeConfig.public.formrelay = {
-      publicKey: options.publicKey ?? "",
+      publicKey: options.publicKey,
     };
 
     if (options.secretKey) {

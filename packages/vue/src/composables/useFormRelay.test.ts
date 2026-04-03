@@ -449,6 +449,47 @@ describe("useFormRelay", () => {
       { botToken: "new-token" },
     );
   });
+
+  test("skips schema fetch when publicKey is not provided", async () => {
+    const { schema, schemaLoading, fields, values } = useFormRelay({
+      formId: "01abc",
+    });
+
+    await nextTick();
+    await nextTick();
+
+    expect(mockGetSchema).not.toHaveBeenCalled();
+    expect(schemaLoading.value).toBe(false);
+    expect(schema.value).toBeNull();
+    expect(fields.value).toEqual([]);
+    expect(Object.keys(values)).toEqual([]);
+  });
+
+  test("submit is a no-op when no schema is available", async () => {
+    const { submit, values, submitting } = useFormRelay({
+      formId: "01abc",
+    });
+
+    values.email = "john@example.com";
+    await submit();
+
+    expect(mockSubmit).not.toHaveBeenCalled();
+    expect(submitting.value).toBe(false);
+  });
+
+  test("uses initialSchema without publicKey for display-only rendering", () => {
+    const { schema, schemaLoading, fields, values } = useFormRelay({
+      formId: "01abc",
+      initialSchema: mockSchema,
+    });
+
+    expect(mockGetSchema).not.toHaveBeenCalled();
+    expect(schemaLoading.value).toBe(false);
+    expect(schema.value).toEqual(mockSchema);
+    expect(fields.value).toHaveLength(2);
+    expect(values.email).toBe("");
+    expect(values.name).toBe("");
+  });
 });
 
 describe("auto bot protection", () => {

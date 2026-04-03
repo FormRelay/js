@@ -1,8 +1,8 @@
-import { effectScope, onScopeDispose } from "vue";
+import { effectScope, onScopeDispose, type Ref } from "vue";
 import { useFormRelay as useVueFormRelay } from "@formrelay/vue";
 import type { UseFormRelayOptions } from "@formrelay/vue";
 import { createForm } from "@formrelay/core";
-import type { HttpAdapter, HttpResponse, RequestOptions } from "@formrelay/core";
+import type { FormSchema, HttpAdapter, HttpResponse, RequestOptions } from "@formrelay/core";
 import { useRuntimeConfig, useAsyncData } from "#imports";
 
 function createSecretKeyAdapter(secretKey: string): HttpAdapter {
@@ -36,7 +36,7 @@ function createSecretKeyAdapter(secretKey: string): HttpAdapter {
 export async function useFormRelay(options: Partial<UseFormRelayOptions> & { formId: string }) {
   const runtimeConfig = useRuntimeConfig();
   const config = runtimeConfig.public.formrelay as {
-    publicKey: string;
+    publicKey?: string;
   };
 
   const secretKey = (runtimeConfig as Record<string, unknown>).formrelaySecretKey as
@@ -51,23 +51,28 @@ export async function useFormRelay(options: Partial<UseFormRelayOptions> & { for
   const scope = effectScope();
   onScopeDispose(() => scope.stop());
 
-  const schemaClient =
-    import.meta.server && secretKey
-      ? createForm(options.formId, {
-          publicKey,
-          httpClient: createSecretKeyAdapter(secretKey),
-        })
-      : createForm(options.formId, { publicKey });
+  let initialSchema: Ref<FormSchema | null> | undefined;
 
-  const { data: initialSchema } = await useAsyncData(`formrelay-schema-${options.formId}`, () =>
-    schemaClient.getSchema(),
-  );
+  if (publicKey) {
+    const schemaClient =
+      import.meta.server && secretKey
+        ? createForm(options.formId, {
+            publicKey,
+            httpClient: createSecretKeyAdapter(secretKey),
+          })
+        : createForm(options.formId, { publicKey });
+
+    const asyncData = await useAsyncData(`formrelay-schema-${options.formId}`, () =>
+      schemaClient.getSchema(),
+    );
+    initialSchema = asyncData.data;
+  }
 
   return scope.run(() =>
     useVueFormRelay({
       formId: options.formId,
       publicKey,
-      initialSchema: initialSchema.value ?? undefined,
+      initialSchema: initialSchema?.value ?? undefined,
       botProtectionContainer: options.botProtectionContainer,
       validate: options.validate,
       onSuccess: options.onSuccess,
