@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, test, vi } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
-import { h, nextTick } from "vue";
+import { h, nextTick, ref } from "vue";
 import FormRelay from "./FormRelay";
 import { FormRelayError } from "@formrelay/core";
 
@@ -298,6 +298,42 @@ describe("FormRelay", () => {
     expect(mockGetSchema).not.toHaveBeenCalled();
     expect(slotProps.schemaLoading).toBe(false);
     expect(slotProps.fields).toHaveLength(1);
+  });
+
+  test("forwards botProtectionContainer as reactive ref to composable", async () => {
+    const containerRef = ref<HTMLElement | null>(null);
+
+    const mockSchemaWithBot = {
+      ...mockSchema,
+      botProtection: { type: "turnstile" as const, siteKey: "0x-key" },
+    };
+
+    const { createForm } = await import("@formrelay/core");
+    vi.mocked(createForm).mockReturnValueOnce({
+      getSchema: vi.fn().mockResolvedValue(mockSchemaWithBot),
+      submit: vi.fn().mockResolvedValue({ success: true, message: "OK" }),
+    } as any);
+
+    let slotProps: any;
+
+    mount(FormRelay, {
+      props: {
+        formId: "01abc",
+        publicKey: "pk_fr_test",
+        botProtectionContainer: containerRef,
+      },
+      slots: {
+        default: (props: any) => {
+          slotProps = props;
+          return h("div");
+        },
+      },
+    });
+
+    await flushPromises();
+    await nextTick();
+
+    expect(slotProps.botProtection).toEqual({ type: "turnstile", siteKey: "0x-key" });
   });
 
   test("renders default slot immediately when publicKey is omitted", () => {

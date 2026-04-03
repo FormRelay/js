@@ -476,6 +476,20 @@ describe("useFormRelay", () => {
     expect(mockSubmit).not.toHaveBeenCalled();
     expect(submitting.value).toBe(false);
   });
+
+  test("uses initialSchema without publicKey for display-only rendering", () => {
+    const { schema, schemaLoading, fields, values } = useFormRelay({
+      formId: "01abc",
+      initialSchema: mockSchema,
+    });
+
+    expect(mockGetSchema).not.toHaveBeenCalled();
+    expect(schemaLoading.value).toBe(false);
+    expect(schema.value).toEqual(mockSchema);
+    expect(fields.value).toHaveLength(2);
+    expect(values.email).toBe("");
+    expect(values.name).toBe("");
+  });
 });
 
 describe("auto bot protection", () => {

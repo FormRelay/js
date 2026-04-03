@@ -36,7 +36,7 @@ function createSecretKeyAdapter(secretKey: string): HttpAdapter {
 export async function useFormRelay(options: Partial<UseFormRelayOptions> & { formId: string }) {
   const runtimeConfig = useRuntimeConfig();
   const config = runtimeConfig.public.formrelay as {
-    publicKey: string;
+    publicKey?: string;
   };
 
   const secretKey = (runtimeConfig as Record<string, unknown>).formrelaySecretKey as

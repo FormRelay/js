@@ -52,8 +52,7 @@ export function useFormRelay(options: UseFormRelayOptions): UseFormRelayReturn {
     schemaError.value = null;
 
     try {
-      if (!client) return;
-      const loadedSchema = await client.getSchema();
+      const loadedSchema = await client!.getSchema();
       schema.value = loadedSchema;
       initializeValues(loadedSchema);
     } catch (error) {
