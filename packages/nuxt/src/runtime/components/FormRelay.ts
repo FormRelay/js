@@ -1,6 +1,6 @@
 import { defineComponent, toRef, type PropType, type Ref } from "vue";
 import { renderFormRelay } from "@formrelay/vue";
-import type { FormRelayError, JsonSchema } from "@formrelay/core";
+import type { BotProtection, FormRelayError, JsonSchema } from "@formrelay/core";
 import { useFormRelay } from "../composables/useFormRelay";
 
 // No initialSchema prop — the Nuxt composable handles SSR schema
@@ -14,6 +14,11 @@ export default defineComponent({
       type: Object as PropType<Ref<HTMLElement | null>>,
       default: undefined,
     },
+    botProtection: {
+      type: Object as PropType<BotProtection>,
+      default: undefined,
+    },
+    honeypotField: { type: String, default: undefined },
     validate: {
       type: Function as PropType<
         (data: Record<string, unknown>, schema: JsonSchema) => Record<string, string[]>
@@ -34,6 +39,8 @@ export default defineComponent({
       formId: props.formId,
       publicKey: props.publicKey,
       botProtectionContainer: toRef(props, "botProtectionContainer"),
+      botProtection: props.botProtection,
+      honeypotField: props.honeypotField,
       validate: props.validate,
       onSuccess: props.onSuccess,
       onError: props.onError,

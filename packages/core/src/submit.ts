@@ -1,6 +1,6 @@
 import type { HttpAdapter } from "./http/types";
 import { parseJsonSafe } from "./http/parse-json";
-import type { FormSchema, SubmitOptions } from "./types";
+import type { BotProtection, FormSchema, SubmitOptions } from "./types";
 import { FormRelayError, parseErrorResponse } from "./errors";
 
 const BOT_TOKEN_FIELDS: Record<string, string> = {
@@ -13,15 +13,25 @@ export type SubmitResult =
   | { success: true; message: string }
   | { success: false; error: FormRelayError };
 
+export interface SubmitConfig {
+  submitUrl: string;
+  honeypotField?: string | null;
+  botProtection?: BotProtection | null;
+}
+
 export async function submitForm(
   data: Record<string, unknown>,
-  schema: FormSchema,
+  schemaOrConfig: FormSchema | SubmitConfig,
   httpClient: HttpAdapter,
   options?: SubmitOptions,
 ): Promise<SubmitResult> {
-  const body = buildRequestBody(data, schema, options);
+  const submitUrl = schemaOrConfig.submitUrl;
+  const honeypotField = schemaOrConfig.honeypotField ?? null;
+  const botProtection = schemaOrConfig.botProtection ?? null;
 
-  const response = await httpClient.post(schema.submitUrl, body, {
+  const body = buildRequestBody(data, honeypotField, botProtection, options);
+
+  const response = await httpClient.post(submitUrl, body, {
     headers: {},
   });
 
@@ -54,23 +64,24 @@ export async function submitForm(
 
 function buildRequestBody(
   data: Record<string, unknown>,
-  schema: FormSchema,
+  honeypotField: string | null,
+  botProtection: BotProtection | null,
   options?: SubmitOptions,
 ): Record<string, unknown> {
   const body: Record<string, unknown> = { ...data };
 
-  if (schema.honeypotField) {
-    body[schema.honeypotField] = "";
+  if (honeypotField) {
+    body[honeypotField] = "";
   }
 
-  if (!options?.botToken || !schema.botProtection) {
+  if (!options?.botToken || !botProtection) {
     return body;
   }
 
-  const tokenField = BOT_TOKEN_FIELDS[schema.botProtection.type];
+  const tokenField = BOT_TOKEN_FIELDS[botProtection.type];
   if (!tokenField) {
     throw new Error(
-      `Unknown bot protection type "${schema.botProtection.type}". ` +
+      `Unknown bot protection type "${botProtection.type}". ` +
         `Supported types: ${Object.keys(BOT_TOKEN_FIELDS).join(", ")}`,
     );
   }

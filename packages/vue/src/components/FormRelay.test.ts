@@ -353,4 +353,31 @@ describe("FormRelay", () => {
     expect(slotProps.schemaLoading).toBe(false);
     expect(slotProps.fields).toEqual([]);
   });
+
+  test("submits without publicKey when no schema is needed", async () => {
+    const { createForm } = await import("@formrelay/core");
+    const mockSubmitFn = vi.fn().mockResolvedValue({ success: true, message: "OK" });
+    vi.mocked(createForm).mockReturnValueOnce({
+      getSchema: vi.fn(),
+      submit: mockSubmitFn,
+    } as any);
+
+    let slotProps: any;
+
+    mount(FormRelay, {
+      props: { formId: "01abc" },
+      slots: {
+        default: (props: any) => {
+          slotProps = props;
+          return h("div");
+        },
+      },
+    });
+
+    slotProps.values.email = "john@example.com";
+    await slotProps.submit();
+
+    expect(mockSubmitFn).toHaveBeenCalled();
+    expect(slotProps.submitted).toBe(true);
+  });
 });

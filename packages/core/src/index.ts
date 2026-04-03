@@ -8,7 +8,7 @@ export type {
   JsonSchema,
   SubmitOptions,
 } from "./types";
-export type { SubmitResult } from "./submit";
+export type { SubmitConfig, SubmitResult } from "./submit";
 export type { ErrorOptions } from "./errors";
 export {
   BotProtectionError,

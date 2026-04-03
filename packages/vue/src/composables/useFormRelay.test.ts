@@ -332,7 +332,7 @@ describe("useFormRelay", () => {
     expect(submitted.value).toBe(false);
   });
 
-  test("does not submit when schema is not loaded", async () => {
+  test("submits even when schema is not yet loaded (client handles fetch)", async () => {
     mockGetSchema.mockReturnValue(new Promise(() => {})); // never resolves
 
     const { submit } = useFormRelay({
@@ -342,7 +342,7 @@ describe("useFormRelay", () => {
 
     await submit();
 
-    expect(mockSubmit).not.toHaveBeenCalled();
+    expect(mockSubmit).toHaveBeenCalled();
   });
 
   test("canSubmit is false while bot protection token is missing", () => {
@@ -465,16 +465,31 @@ describe("useFormRelay", () => {
     expect(Object.keys(values)).toEqual([]);
   });
 
-  test("submit is a no-op when no schema is available", async () => {
-    const { submit, values, submitting } = useFormRelay({
+  test("submits without schema when no publicKey is provided", async () => {
+    const { submit, values, submitted } = useFormRelay({
       formId: "01abc",
     });
 
     values.email = "john@example.com";
     await submit();
 
-    expect(mockSubmit).not.toHaveBeenCalled();
-    expect(submitting.value).toBe(false);
+    expect(mockSubmit).toHaveBeenCalledWith(
+      { email: "john@example.com" },
+      {},
+    );
+    expect(submitted.value).toBe(true);
+  });
+
+  test("canSubmit is false when options.botProtection is set and no token provided", () => {
+    const { canSubmit, setBotToken } = useFormRelay({
+      formId: "01abc",
+      botProtection: { type: "turnstile", siteKey: "0x-key" },
+    });
+
+    expect(canSubmit.value).toBe(false);
+
+    setBotToken("token");
+    expect(canSubmit.value).toBe(true);
   });
 
   test("uses initialSchema without publicKey for display-only rendering", () => {

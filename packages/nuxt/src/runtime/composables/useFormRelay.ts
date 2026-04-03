@@ -74,6 +74,8 @@ export async function useFormRelay(options: Partial<UseFormRelayOptions> & { for
       publicKey,
       initialSchema: initialSchema?.value ?? undefined,
       botProtectionContainer: options.botProtectionContainer,
+      botProtection: options.botProtection,
+      honeypotField: options.honeypotField,
       validate: options.validate,
       onSuccess: options.onSuccess,
       onError: options.onError,
