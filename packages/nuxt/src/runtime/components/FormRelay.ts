@@ -15,9 +15,7 @@ export default defineComponent({
     const state = await useFormRelay({
       formId: props.formId,
       publicKey: props.publicKey,
-      botProtectionContainer: props.botProtectionContainer
-        ? toRef(props, "botProtectionContainer")
-        : undefined,
+      botProtectionContainer: toRef(props, "botProtectionContainer"),
       validate: props.validate,
       onSuccess: props.onSuccess,
       onError: props.onError,

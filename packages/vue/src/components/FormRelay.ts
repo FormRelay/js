@@ -18,9 +18,7 @@ export default defineComponent({
       formId: props.formId,
       publicKey: props.publicKey,
       initialSchema: props.initialSchema,
-      botProtectionContainer: props.botProtectionContainer
-        ? toRef(props, "botProtectionContainer")
-        : undefined,
+      botProtectionContainer: toRef(props, "botProtectionContainer"),
       validate: props.validate,
       onSuccess: props.onSuccess,
       onError: props.onError,
